@@ -10,6 +10,7 @@ import type { FeedItem, SampleTrace } from '../config/feed';
 import type { MyTrace, Point } from '../data/storage';
 import { toSvgPath } from '../lib/path';
 import { useFit } from '../lib/useFit';
+import { usePhotoURL } from '../data/photos';
 
 const COLORS = ['var(--c-pink)', 'var(--c-blue)', 'var(--c-teal)', 'var(--c-lilac)', 'var(--c-yellow)'];
 const INK = '#1A1A1A';
@@ -27,10 +28,12 @@ function Lines({ outline, details, aspect, color, width, faded }: { outline: Poi
 
 function Photo({ item, children }: { item: FeedItem; children?: preact.ComponentChildren }) {
   const [stageRef, size] = useFit<HTMLDivElement>(item.aspect);
+  const ownURL = usePhotoURL(item.kind === 'view' ? item.ownPhotoId : undefined);
+  const src = item.kind === 'view' && item.ownPhotoId ? ownURL : item.photo;
   return (
     <div class="feed-stage" ref={stageRef}>
       <div class="feed-photo" style={{ width: `${size.w}px`, height: `${size.h}px` }}>
-        <img src={item.photo} alt="" draggable={false} />
+        {src && <img src={src} alt="" draggable={false} />}
         {children}
       </div>
     </div>
@@ -53,7 +56,7 @@ export function FeedCard({ item, mine, onDraw, onNext }: Props) {
       <article class="card feed-card">
         <Photo item={item}>{overlay(item.aspect, <Lines outline={t.outline} details={t.details} aspect={item.aspect} color={INK} width={4} />)}</Photo>
         <div class="feed-body">
-          <p class="small muted">だれかの見え方</p>
+          <p class="small muted">{item.ownPhotoId ? 'あなたの投稿' : 'だれかの見え方'}</p>
           <h2 class="head feed-name">{t.name}</h2>
           <button class="btn block feed-next" onClick={onNext}>次へ</button>
         </div>

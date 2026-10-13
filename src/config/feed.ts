@@ -14,7 +14,12 @@ import type { Point } from '../data/storage';
 export type SampleTrace = { id: string; name: string; outline: Point[]; details: Point[][] };
 
 type Base = { id: string; photo: string; aspect: number };
-export type ViewItem = Base & { kind: 'view'; trace: SampleTrace };
+export type ViewItem = Base & {
+  kind: 'view';
+  trace: SampleTrace;
+  /** 自分が投稿した形のとき：写真は IndexedDB のこのキー（photo は空） */
+  ownPhotoId?: string;
+};
 export type AskItem = Base & { kind: 'ask'; traces: SampleTrace[] };
 export type OdaiItem = Base & { kind: 'odai'; odaiTitle: string; traces: SampleTrace[] };
 export type FeedItem = ViewItem | AskItem | OdaiItem;

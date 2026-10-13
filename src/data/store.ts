@@ -39,3 +39,11 @@ export function addShape(shape: Shape) {
 export function setMyTrace(postId: string, trace: MyTrace) {
   update({ ...state, myTraces: { ...state.myTraces, [postId]: trace } });
 }
+
+/** 形をつながりに投稿する／取り消す */
+export function setPosted(shapeId: string, posted: boolean) {
+  update({
+    ...state,
+    shapes: state.shapes.map((s) => (s.id === shapeId ? { ...s, postedAt: posted ? new Date().toISOString() : undefined } : s)),
+  });
+}

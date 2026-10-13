@@ -31,7 +31,8 @@ function place(shape: Shape, i: number) {
 
 export function CollectScreen() {
   const { shapes } = useAppState();
-  const [open, setOpen] = useState<Shape | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const open = shapes.find((s) => s.id === openId) ?? null;
   const [newId] = useState(takeLastAddedId);
 
   return (
@@ -59,7 +60,7 @@ export function CollectScreen() {
               <button
                 class={`floater${s.id === newId ? ' is-new' : ''}`}
                 style={{ left: `${p.left}%`, top: `${p.top}px`, '--r0': `${p.r0}deg`, '--r1': `${p.r1}deg`, animationDelay: `-${p.delay}s` }}
-                onClick={() => setOpen(s)}
+                onClick={() => setOpenId(s.id)}
                 aria-label={`${s.name}をひらく`}
               >
                 <ShapeSticker shape={s} maxSide={p.size} uid={`c-${s.id}`} />
@@ -76,7 +77,7 @@ export function CollectScreen() {
         </div>
       </div>
 
-      {open && <Portal><ShapeDetail shape={open} onClose={() => setOpen(null)} /></Portal>}
+      {open && <Portal><ShapeDetail shape={open} onClose={() => setOpenId(null)} /></Portal>}
     </div>
   );
 }

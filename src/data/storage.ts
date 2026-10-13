@@ -7,7 +7,7 @@
  */
 import { STORAGE_PREFIX } from '../config/env';
 
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 /** 写真上の座標。写真の幅・高さを 1 とした割合（0〜1） */
 export type Point = [number, number];
@@ -24,6 +24,8 @@ export interface Shape {
   outline: Point[];
   /** 描き足した線（目・手足など）。1 本ずつの配列 */
   details: Point[][];
+  /** つながりに投稿した日時（ISO）。未投稿なら undefined */
+  postedAt?: string;
 }
 
 /** つながりで、ほかの人の写真（またはお題）に自分が描いた見え方 */
@@ -54,6 +56,8 @@ const migrations: Record<number, (s: any) => any> = {
   1: (s) => ({ ...s, shapes: [] }),
   // v3：つながりで描いた見え方（myTraces）を追加
   2: (s) => ({ ...s, myTraces: {} }),
+  // v4：形に postedAt（つながりへの投稿）を追加。省略可の項目なので既存データはそのまま
+  3: (s) => s,
 };
 
 function initialState(): AppState {
