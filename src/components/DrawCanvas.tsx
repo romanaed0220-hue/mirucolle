@@ -110,9 +110,10 @@ export function DrawCanvas(props: Props) {
     const down = (e: PointerEvent) => {
       if (live.current) return; // 2 本目の指は無視
       e.preventDefault();
+      // 閉じた形ができたら、うっかり触っても消さない（消すのは「やり直す」だけ）
+      if (propsRef.current.mode === 'outline' && propsRef.current.outline) return;
       try { c.setPointerCapture(e.pointerId); } catch { /* 合成イベントなどで失敗しても描画は続ける */ }
       live.current = { id: e.pointerId, pts: [toPoint(e)] };
-      if (propsRef.current.mode === 'outline') propsRef.current.onOutline?.(null, false);
       draw();
     };
     const move = (e: PointerEvent) => {

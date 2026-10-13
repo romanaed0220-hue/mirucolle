@@ -58,7 +58,9 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLab
 
       <p class="flow-hint small">
         {step === 'trace'
-          ? tooSmall
+          ? outline
+            ? '形ができました。描き直すときは「やり直す」を押してください。'
+            : tooSmall
             ? 'もう少し大きく、ぐるっと一周囲んでみてください。'
             : '見えた形を、指でぐるっと一周なぞってください。'
           : '目や口、手足などを描き足して、名前をつけましょう。'}
