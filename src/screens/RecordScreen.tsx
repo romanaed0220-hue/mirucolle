@@ -2,8 +2,13 @@ import { useRef, useState } from 'preact/hooks';
 import { Camera, Image as ImageIcon } from 'lucide-preact';
 import { Dots, Ring, Squiggle } from '../components/Deco';
 import { Portal } from '../components/Portal';
-import { compressPhoto } from '../data/photos';
-import { RecordFlow, type PickedPhoto } from './RecordFlow';
+import { TraceFlow } from '../components/TraceFlow';
+import { compressPhoto, savePhoto } from '../data/photos';
+import { addShape } from '../data/store';
+import { newId } from '../lib/path';
+import { href } from '../router';
+
+type PickedPhoto = { blob: Blob; url: string; width: number; height: number };
 
 const STEPS = [
   { n: 1, title: '撮る', text: '「何かに見える」瞬間を撮る' },
@@ -74,7 +79,23 @@ export function RecordScreen() {
         <input ref={albumRef} type="file" accept="image/*" hidden onChange={onPick} />
       </div>
 
-      {photo && <Portal><RecordFlow photo={photo} onClose={closeFlow} /></Portal>}
+      {photo && (
+        <Portal>
+          <TraceFlow
+            photoURL={photo.url}
+            aspect={photo.width / photo.height}
+            showTakeStep
+            onClose={closeFlow}
+            onSave={async ({ outline, details, name }) => {
+              const id = newId();
+              await savePhoto(id, photo.blob);
+              addShape({ id, createdAt: new Date().toISOString(), name, photoId: id, aspect: photo.width / photo.height, outline, details });
+              closeFlow();
+              location.hash = href('collect');
+            }}
+          />
+        </Portal>
+      )}
     </div>
   );
 }

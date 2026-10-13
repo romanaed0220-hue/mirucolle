@@ -1,25 +1,30 @@
-// 記録の 2〜3 ステップ（なぞる → 描き足す・名付ける → 保存）。写真を選んだあと全画面で開く。
+// なぞる → 描き足す・名付ける の全画面フロー。記録（自分の写真）とつながり（ほかの人の写真）で共用。
 import { useState } from 'preact/hooks';
 import { RotateCcw, Undo2, X } from 'lucide-preact';
 import { DrawCanvas } from '../components/DrawCanvas';
-import { savePhoto } from '../data/photos';
-import { addShape } from '../data/store';
 import type { Point } from '../data/storage';
-import { newId } from '../lib/path';
-import { href } from '../router';
 
-export type PickedPhoto = { blob: Blob; url: string; width: number; height: number };
+export type TraceResult = { outline: Point[]; details: Point[][]; name: string };
 
 const NAME_MAX = 20;
 
-export function RecordFlow({ photo, onClose }: { photo: PickedPhoto; onClose: () => void }) {
+type Props = {
+  photoURL: string;
+  aspect: number;
+  /** 記録では「撮る」を済みとして表示する */
+  showTakeStep?: boolean;
+  saveLabel?: string;
+  onSave: (r: TraceResult) => Promise<void>;
+  onClose: () => void;
+};
+
+export function TraceFlow({ photoURL, aspect, showTakeStep, saveLabel = '保存する', onSave, onClose }: Props) {
   const [step, setStep] = useState<'trace' | 'detail'>('trace');
   const [outline, setOutline] = useState<Point[] | null>(null);
   const [tooSmall, setTooSmall] = useState(false);
   const [details, setDetails] = useState<Point[][]>([]);
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
-  const aspect = photo.width / photo.height;
 
   const close = () => {
     if (outline && !confirm('描いた形は保存されません。やめますか？')) return;
@@ -30,19 +35,7 @@ export function RecordFlow({ photo, onClose }: { photo: PickedPhoto; onClose: ()
     if (!outline || saving) return;
     setSaving(true);
     try {
-      const id = newId();
-      await savePhoto(id, photo.blob);
-      addShape({
-        id,
-        createdAt: new Date().toISOString(),
-        name: name.trim() || 'なまえのない形',
-        photoId: id,
-        aspect,
-        outline,
-        details,
-      });
-      onClose();
-      location.hash = href('collect');
+      await onSave({ outline, details, name: name.trim() || 'なまえのない形' });
     } catch (e) {
       console.error(e);
       alert('保存できませんでした。もう一度お試しください。');
@@ -55,7 +48,7 @@ export function RecordFlow({ photo, onClose }: { photo: PickedPhoto; onClose: ()
       <header class="flow-head">
         <button class="icon-btn" aria-label="やめる" onClick={close}><X size={20} strokeWidth={2.4} /></button>
         <ol class="flow-steps" aria-label="ステップ">
-          <li class="done">撮る</li>
+          {showTakeStep && <li class="done">撮る</li>}
           <li class={step === 'trace' ? 'on' : 'done'}>なぞる</li>
           <li class={step === 'detail' ? 'on' : ''}>描き足す・名付ける</li>
         </ol>
@@ -70,7 +63,7 @@ export function RecordFlow({ photo, onClose }: { photo: PickedPhoto; onClose: ()
       </p>
 
       <DrawCanvas
-        photoURL={photo.url}
+        photoURL={photoURL}
         aspect={aspect}
         mode={step === 'trace' ? 'outline' : 'detail'}
         outline={outline}
@@ -105,7 +98,7 @@ export function RecordFlow({ photo, onClose }: { photo: PickedPhoto; onClose: ()
             <button class="btn" onClick={() => (details.length ? setDetails((d) => d.slice(0, -1)) : setStep('trace'))}>
               <Undo2 size={18} strokeWidth={2.4} />{details.length ? '一つ戻す' : 'なぞり直す'}
             </button>
-            <button class="btn primary" onClick={save} disabled={saving}>{saving ? '保存中…' : '保存する'}</button>
+            <button class="btn primary" onClick={save} disabled={saving}>{saving ? '保存中…' : saveLabel}</button>
           </div>
         </footer>
       )}

@@ -30,17 +30,63 @@
 .bottle { width: 40px; height: 58px; overflow: visible; }
 
 /* ---------- つながり ---------- */
-.connect { flex: 1; display: flex; padding-bottom: 22px; }
-.odai { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 420px; }
-.odai-photo { flex: 1; position: relative; border-bottom: var(--border); }
-.odai-photo svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.odai-photo .chip { position: absolute; top: 12px; left: 12px; }
-.odai-body { padding: 14px 16px 16px; }
-.odai-q { font-size: 18px; }
-.odai-rule { margin-top: 8px; display: flex; gap: 6px; }
-.odai-rule svg { flex: 0 0 auto; margin-top: 3px; }
-.odai-actions { display: flex; gap: 10px; margin-top: 14px; }
-.odai-actions .btn { flex: 1; }
+.connect-screen { overflow: hidden; }
+.feed {
+  flex: 1; min-height: 0;
+  display: flex;
+  overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.feed::-webkit-scrollbar { display: none; }
+.feed-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  padding: 4px 20px 22px 16px;
+  display: flex;
+  min-height: 0;
+}
+.feed-end { flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; }
+.feed-card { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.feed-stage {
+  flex: 1 1 0; min-height: 140px;
+  position: relative;
+  display: grid; place-items: center;
+  background: var(--page-outside);
+  border-bottom: var(--border);
+  overflow: hidden;
+}
+.feed-photo { position: relative; }
+.feed-photo img, .feed-photo svg { position: absolute; inset: 0; width: 100%; height: 100%; user-select: none; -webkit-user-select: none; }
+.feed-tag { position: absolute; top: 12px; left: 12px; }
+.feed-lock {
+  position: absolute; right: 12px; bottom: 12px;
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--surface); color: var(--ink);
+}
+.feed-body { flex: 0 0 auto; padding: 14px 16px 16px; }
+.feed-q { font-size: 18px; }
+.feed-q.small-q { font-size: 16px; }
+.feed-rule { margin-top: 8px; display: flex; gap: 6px; }
+.feed-rule svg { flex: 0 0 auto; margin-top: 3px; }
+.feed-first { margin-top: 8px; }
+.feed-actions { display: flex; gap: 10px; margin-top: 14px; }
+.feed-actions .btn { flex: 1; }
+
+.ways { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.way {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px;
+  border: var(--border); border-radius: 999px;
+  background: var(--surface);
+  font-size: 12px; font-weight: 800;
+}
+.way i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--line); flex: 0 0 auto; }
+.way.on { background: var(--highlight); box-shadow: var(--hard-sm); }
+.is-revealed .ways { animation: reveal .4s steps(4) both; }
+@keyframes reveal { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* ---------- 裏世界 ---------- */
 .ura-title { font-size: 22px; }
@@ -121,3 +167,4 @@
 .detail-name { font-size: 20px; word-break: break-all; }
 .detail-photo { position: relative; width: 100%; border: var(--border); border-radius: var(--r-md); overflow: hidden; background: var(--bg); }
 .detail-photo img, .detail-photo svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.feed-next { margin-top: 14px; }

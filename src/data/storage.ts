@@ -7,7 +7,7 @@
  */
 import { STORAGE_PREFIX } from '../config/env';
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 /** 写真上の座標。写真の幅・高さを 1 とした割合（0〜1） */
 export type Point = [number, number];
@@ -26,6 +26,14 @@ export interface Shape {
   details: Point[][];
 }
 
+/** つながりで、ほかの人の写真（またはお題）に自分が描いた見え方 */
+export interface MyTrace {
+  createdAt: string;
+  name: string;
+  outline: Point[];
+  details: Point[][];
+}
+
 export interface AppState {
   version: typeof SCHEMA_VERSION;
   /** 初回起動日時（ISO） */
@@ -34,6 +42,8 @@ export interface AppState {
   openedDays: string[];
   /** 自分の形（新しい順） */
   shapes: Shape[];
+  /** つながりの投稿 id → 自分の見え方。これがある投稿は「描いたので、ほかの人の見え方がひらいている」 */
+  myTraces: Record<string, MyTrace>;
 }
 
 const KEY = `${STORAGE_PREFIX}:state`;
@@ -42,10 +52,12 @@ const KEY = `${STORAGE_PREFIX}:state`;
 const migrations: Record<number, (s: any) => any> = {
   // v2：形（shapes）を追加
   1: (s) => ({ ...s, shapes: [] }),
+  // v3：つながりで描いた見え方（myTraces）を追加
+  2: (s) => ({ ...s, myTraces: {} }),
 };
 
 function initialState(): AppState {
-  return { version: SCHEMA_VERSION, firstOpenedAt: new Date().toISOString(), openedDays: [], shapes: [] };
+  return { version: SCHEMA_VERSION, firstOpenedAt: new Date().toISOString(), openedDays: [], shapes: [], myTraces: {} };
 }
 
 function migrate(raw: any): AppState {
