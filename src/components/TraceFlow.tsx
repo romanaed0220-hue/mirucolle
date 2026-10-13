@@ -13,12 +13,14 @@ type Props = {
   aspect: number;
   /** 記録では「撮る」を済みとして表示する */
   showTakeStep?: boolean;
+  /** つながりの「先に描く」用：輪郭をなぞるだけで保存（描き足し・名前なし） */
+  outlineOnly?: boolean;
   saveLabel?: string;
   onSave: (r: TraceResult) => Promise<void>;
   onClose: () => void;
 };
 
-export function TraceFlow({ photoURL, aspect, showTakeStep, saveLabel = '保存する', onSave, onClose }: Props) {
+export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLabel = '保存する', onSave, onClose }: Props) {
   const [step, setStep] = useState<'trace' | 'detail'>('trace');
   const [outline, setOutline] = useState<Point[] | null>(null);
   const [tooSmall, setTooSmall] = useState(false);
@@ -35,7 +37,7 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, saveLabel = '保存�
     if (!outline || saving) return;
     setSaving(true);
     try {
-      await onSave({ outline, details, name: name.trim() || 'なまえのない形' });
+      await onSave({ outline, details, name: outlineOnly ? "" : name.trim() || "なまえのない形" });
     } catch (e) {
       console.error(e);
       alert('保存できませんでした。もう一度お試しください。');
@@ -50,7 +52,7 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, saveLabel = '保存�
         <ol class="flow-steps" aria-label="ステップ">
           {showTakeStep && <li class="done">撮る</li>}
           <li class={step === 'trace' ? 'on' : 'done'}>なぞる</li>
-          <li class={step === 'detail' ? 'on' : ''}>描き足す・名付ける</li>
+          {!outlineOnly && <li class={step === "detail" ? "on" : ""}>描き足す・名付ける</li>}
         </ol>
       </header>
 
@@ -80,7 +82,11 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, saveLabel = '保存�
           <button class="btn" onClick={() => { setOutline(null); setTooSmall(false); }} disabled={!outline}>
             <RotateCcw size={18} strokeWidth={2.4} />やり直す
           </button>
-          <button class="btn primary" onClick={() => setStep('detail')} disabled={!outline}>次へ</button>
+          {outlineOnly ? (
+            <button class="btn primary" onClick={save} disabled={!outline || saving}>{saving ? "保存中…" : saveLabel}</button>
+          ) : (
+            <button class="btn primary" onClick={() => setStep("detail")} disabled={!outline}>次へ</button>
+          )}
         </footer>
       ) : (
         <footer class="flow-foot detail">
