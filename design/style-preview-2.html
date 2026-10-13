@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ミルコレ フラット案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=M+PLUS+Rounded+1c:wght@400;500;700&family=M+PLUS+1p:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --page-bg: #F2F2F0; --page-ink: #222; --page-muted: #707070; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--page-bg); color: var(--page-ink); font-family: "Noto Sans JP", system-ui, sans-serif; padding: 32px 16px 64px; }
+  .page-head { max-width: 1200px; margin: 0 auto 28px; }
+  .page-head h1 { font-size: 22px; }
+  .page-head p { color: var(--page-muted); font-size: 14px; margin-top: 6px; line-height: 1.7; }
+  .styles { max-width: 1240px; margin: 0 auto; display: grid; gap: 40px; }
+  .style-block { background: #fff; border-radius: 20px; padding: 24px; }
+  .style-block header h2 { font-size: 20px; }
+  .style-block header .tag { font-size: 13px; color: var(--page-muted); margin-top: 4px; line-height: 1.7; }
+  .row { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 20px; align-items: flex-start; }
+  .notes { flex: 1 1 240px; min-width: 220px; font-size: 13px; line-height: 1.8; color: #333; }
+  .notes h3 { font-size: 13px; margin: 14px 0 6px; color: var(--page-muted); font-weight: 500; }
+  .swatches { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 26px; }
+  .sw { width: 44px; height: 44px; border-radius: 10px; border: 1px solid rgba(0,0,0,.08); position: relative; }
+  .sw span { position: absolute; top: 48px; left: 0; font-size: 10px; color: var(--page-muted); white-space: nowrap; }
+  .ura { display: flex; height: 56px; border-radius: 12px; overflow: hidden; position: relative; }
+  .ura i { flex: 1; }
+  .ura b { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; letter-spacing: .1em; font-weight: 500; }
+
+  /* ---------- phone ---------- */
+  .phone {
+    width: 300px; height: 620px; border-radius: 38px; overflow: hidden; position: relative;
+    box-shadow: 0 0 0 8px #1b1b1b; flex: 0 0 auto;
+    background: var(--bg); color: var(--ink); font-family: var(--font);
+    display: flex; flex-direction: column;
+  }
+  .status { height: 34px; flex: 0 0 auto; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 6px 18px 12px; }
+  .topbar h4 { font-size: 18px; font-weight: 700; letter-spacing: .04em; }
+  .topbar .ic { width: 22px; height: 22px; }
+  .screen { flex: 1; position: relative; overflow: hidden; }
+  .nav { flex: 0 0 auto; display: flex; justify-content: space-around; padding: 10px 8px 22px; background: var(--bg); border-top: 1.5px solid var(--line); }
+  .nav div { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: var(--muted); font-weight: 500; }
+  .nav div.on { color: var(--accent); }
+  .nav div.on svg { background: var(--accent-soft); border-radius: 10px; padding: 3px; width: 30px; height: 26px; }
+  .nav svg { width: 22px; height: 22px; }
+
+  /* つながり card */
+  .card { position: absolute; inset: 2px 16px 14px; border-radius: var(--radius); overflow: hidden; background: var(--surface); border: 1.5px solid var(--line); display: flex; flex-direction: column; }
+  .card .photo { flex: 1; position: relative; }
+  .card .photo svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .card .label { position: absolute; top: 12px; left: 12px; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--tag-bg); color: var(--tag-ink); letter-spacing: .06em; }
+  .card .body { padding: 14px 16px 16px; }
+  .card .q { font-size: 17px; font-weight: 700; }
+  .card .rule { font-size: 11.5px; color: var(--muted); margin-top: 6px; line-height: 1.6; display: flex; gap: 6px; }
+  .card .rule b { color: var(--accent); font-weight: 700; }
+  .card .rule svg { width: 14px; height: 14px; flex: 0 0 auto; margin-top: 2px; color: var(--accent); }
+  .btns { display: flex; gap: 8px; margin-top: 12px; }
+  .btn { flex: 1; text-align: center; padding: 11px 0; border-radius: var(--btn-radius); font-size: 13px; font-weight: 700; }
+  .btn.primary { background: var(--accent); color: var(--on-accent); }
+  .btn.ghost { background: var(--bg-soft); color: var(--muted); }
+
+  .trace { fill: none; stroke: var(--trace); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw 4.2s cubic-bezier(.3,.7,.3,1) infinite; }
+  .trace-under { fill: none; stroke: #fff; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw 4.2s cubic-bezier(.3,.7,.3,1) infinite; }
+  @keyframes draw { 0% { stroke-dashoffset: 600; } 50%, 85% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+
+  /* 収集：ステッカー風。影はぼかさず、ずらした単色 */
+  .shapes { position: absolute; inset: 0; }
+  .shape { position: absolute; animation: float 5s ease-in-out infinite alternate; }
+  .shape svg { width: 100%; height: 100%; overflow: visible; }
+  .shape .sticker { fill: #fff; stroke: #fff; stroke-width: 7; stroke-linejoin: round; }
+  .shape .offset { fill: var(--sticker-shadow); stroke: var(--sticker-shadow); stroke-width: 7; stroke-linejoin: round; }
+  .shape .detail { fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; }
+  @keyframes float { from { transform: translate(0,0) rotate(var(--r0)); } to { transform: translate(var(--dx), var(--dy)) rotate(var(--r1)); } }
+  .shelf { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 18px 12px; display: flex; align-items: flex-end; gap: 14px; }
+  .shelf .cap { font-size: 11px; color: var(--muted); position: absolute; top: -18px; left: 18px; letter-spacing: .08em; font-weight: 500; }
+  .bottle { width: 40px; height: 58px; }
+  .bottle path { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.8; }
+  .bottle.locked path { fill: var(--bg-soft); stroke: none; }
+
+  /* ---------- D: ミント ---------- */
+  .D { --bg: #FFFFFF; --bg-soft: #F1F4F3; --surface: #FFFFFF; --ink: #1E2A28; --muted: #7C8A87; --line: #E4EAE8;
+       --accent: #1FAE7A; --accent-soft: #DDF4EA; --on-accent: #fff; --tag-bg: #fff; --tag-ink: #1FAE7A;
+       --trace: #1FAE7A; --sticker-shadow: #C9EBDD; --font: "Zen Kaku Gothic New", sans-serif; --radius: 16px; --btn-radius: 12px; }
+  /* ---------- E: ソーダ ---------- */
+  .E { --bg: #F5F9FC; --bg-soft: #E8F0F7; --surface: #FFFFFF; --ink: #1D2B3A; --muted: #7A8899; --line: #E1E9F1;
+       --accent: #3A86F7; --accent-soft: #DCE9FE; --on-accent: #fff; --tag-bg: #FFD84A; --tag-ink: #1D2B3A;
+       --trace: #FFD84A; --sticker-shadow: #CFE0FA; --font: "M PLUS Rounded 1c", sans-serif; --radius: 24px; --btn-radius: 999px; }
+  /* ---------- F: コーラル ---------- */
+  .F { --bg: #FFFCF7; --bg-soft: #F6F0E8; --surface: #FFFFFF; --ink: #2A2A2A; --muted: #8C857C; --line: #EFE7DC;
+       --accent: #FF6B57; --accent-soft: #FFE3DD; --on-accent: #fff; --tag-bg: #2EC4B6; --tag-ink: #fff;
+       --trace: #FF6B57; --sticker-shadow: #FFD5CC; --font: "M PLUS 1p", sans-serif; --radius: 10px; --btn-radius: 8px; }
+
+  @media (max-width: 680px) { .phone { width: 100%; max-width: 320px; } .style-block { padding: 18px 16px; } }
+</style>
+</head>
+<body>
+  <div class="page-head">
+    <h1>ミルコレ：フラット案 3 つ</h1>
+    <p>どれも白ベース・単色・グラデーションなし。違いは「アクセント色」と「フォント」と「角の丸さ」。左：つながり／右：収集。写真は仮のフラットなプレースホルダーです。</p>
+  </div>
+  <div class="styles" id="styles"></div>
+<script>
+const STYLES = [
+  { id: 'D', name: 'D. ミント', tag: '白 × ミントグリーン。いちばん素直で清潔。外の空気・植物を連想させる。',
+    colors: [['#FFFFFF','白'],['#1FAE7A','ミント'],['#DDF4EA','淡ミント'],['#1E2A28','文字']],
+    font: 'Zen Kaku Gothic New（すっきりしたゴシック）', corner: '中くらい（16px）',
+    ura: ['#1C2D4A','#2B5F7A','#2FA88E','#8ADBA8','#B59CE8'] },
+  { id: 'E', name: 'E. ソーダ', tag: '淡い水色 × ブルー、差し色にレモン。明るく軽快、いちばん「清新」。丸ゴシックで親しみやすい。',
+    colors: [['#F5F9FC','地'],['#3A86F7','ブルー'],['#FFD84A','レモン'],['#1D2B3A','文字']],
+    font: 'M PLUS Rounded 1c（丸ゴシック）', corner: '大きめ（24px／ボタンは丸）',
+    ura: ['#1A1F4D','#3B3FA8','#2E9CC9','#5ED8B4','#F28AC6'] },
+  { id: 'F', name: 'F. コーラル', tag: '生成りの白 × コーラル、差し色にティール。少し温かみのある清潔感。角は控えめでキリッと。',
+    colors: [['#FFFCF7','生成り'],['#FF6B57','コーラル'],['#2EC4B6','ティール'],['#2A2A2A','文字']],
+    font: 'M PLUS 1p（端正なゴシック）', corner: '小さめ（10px）',
+    ura: ['#20234A','#3D3A8C','#2C8E9C','#57D0A6','#FF9A8A'] },
+];
+
+const SKY = '#7EC3F0', CLOUD = '#FFFFFF';
+const skyPhoto = () => `<rect width="100" height="100" fill="${SKY}"/>
+  <ellipse cx="30" cy="42" rx="20" ry="10" fill="${CLOUD}"/><ellipse cx="46" cy="34" rx="16" ry="12" fill="${CLOUD}"/>
+  <ellipse cx="62" cy="44" rx="18" ry="9" fill="${CLOUD}"/><ellipse cx="78" cy="76" rx="14" ry="6" fill="${CLOUD}" opacity=".8"/>`;
+const PHOTOS = {
+  sky: skyPhoto,
+  wall: () => `<rect width="100" height="100" fill="#C9BBA7"/><circle cx="30" cy="30" r="10" fill="#B3A38D"/><circle cx="72" cy="62" r="15" fill="#D8CCBB"/><circle cx="40" cy="78" r="6" fill="#B3A38D"/>`,
+  wood: () => `<rect width="100" height="100" fill="#D79A62"/><rect y="22" width="100" height="8" fill="#C4864F"/><rect y="52" width="100" height="6" fill="#C4864F"/><rect y="78" width="100" height="9" fill="#C4864F"/>`,
+};
+const SHAPES = [
+  { photo: 'sky', path: 'M8,58 C14,38 38,30 58,36 C70,26 84,24 92,32 C86,38 82,42 80,48 C86,58 78,76 58,76 C38,82 16,74 8,58 Z', detail: 'M26,52 a2,2 0 1,0 0.1,0 M70,30 q4,-10 10,-12' },
+  { photo: 'wall', path: 'M50,8 C76,8 93,28 91,53 C89,79 70,94 48,92 C24,90 8,72 10,48 C12,24 27,8 50,8 Z', detail: 'M30,44 q6,4 12,0 M58,44 q6,4 12,0 M40,68 q10,6 20,0' },
+  { photo: 'wood', path: 'M18,32 L25,8 L40,24 C46,22 54,22 60,24 L75,8 L82,32 C93,47 90,73 72,86 C58,96 40,96 26,86 C10,73 7,47 18,32 Z', detail: 'M34,50 a3,3 0 1,0 0.1,0 M64,50 a3,3 0 1,0 0.1,0 M46,62 l4,4 l4,-4' },
+];
+const icon = {
+  record: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>',
+  collect: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v5.5L5.5 17A3 3 0 0 0 8.2 21h7.6a3 3 0 0 0 2.7-4L14 7.5V2"/><path d="M8.5 2h7"/><path d="M7 15h10"/></svg>',
+  connect: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  menu: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>',
+  sparkle: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 17v4M17 19h4"/></svg>',
+  pencil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>',
+};
+const nav = (on) => `<div class="nav">
+  <div class="${on==='record'?'on':''}">${icon.record}記録</div>
+  <div class="${on==='collect'?'on':''}">${icon.collect}収集</div>
+  <div class="${on==='connect'?'on':''}">${icon.connect}つながり</div></div>`;
+
+const connectPhone = () => `<div class="phone"><div class="status"></div>
+  <div class="topbar">${icon.menu}<h4>つながり</h4>${icon.sparkle}</div>
+  <div class="screen"><div class="card">
+    <div class="photo"><svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">${skyPhoto()}
+      <path class="trace-under" pathLength="600" d="${SHAPES[0].path}" transform="translate(0,4)"/>
+      <path class="trace" pathLength="600" d="${SHAPES[0].path}" transform="translate(0,4)"/></svg>
+      <div class="label">今月のお題</div></div>
+    <div class="body">
+      <div class="q">あなたには何に見えますか？</div>
+      <div class="rule">${icon.pencil}<span><b>先に描く、それから見る。</b>描き終えると、ほかの人の見え方がひらきます。</span></div>
+      <div class="btns"><div class="btn ghost">スキップ</div><div class="btn primary">なぞってみる</div></div>
+    </div></div></div>${nav('connect')}</div>`;
+
+function collectPhone(id) {
+  const pos = [
+    { l: 22, t: 24, s: 120, r0: '-6deg', r1: '3deg', dx: '8px', dy: '-10px', d: '0s' },
+    { l: 152, t: 118, s: 108, r0: '5deg', r1: '-4deg', dx: '-6px', dy: '8px', d: '-1.5s' },
+    { l: 40, t: 218, s: 112, r0: '-3deg', r1: '6deg', dx: '10px', dy: '5px', d: '-3s' },
+  ];
+  const shapes = SHAPES.map((s, i) => { const p = `${id}s${i}`, q = pos[i];
+    return `<div class="shape" style="left:${q.l}px;top:${q.t}px;width:${q.s}px;height:${q.s}px;--r0:${q.r0};--r1:${q.r1};--dx:${q.dx};--dy:${q.dy};animation-delay:${q.d}">
+      <svg viewBox="0 0 100 100"><defs><clipPath id="${p}c"><path d="${s.path}"/></clipPath></defs>
+        <path class="offset" d="${s.path}" transform="translate(4,5)"/>
+        <path class="sticker" d="${s.path}"/>
+        <g clip-path="url(#${p}c)">${PHOTOS[s.photo]()}</g>
+        <path class="detail" d="${s.detail}"/></svg></div>`; }).join('');
+  const bottle = (l) => `<svg class="bottle ${l?'locked':''}" viewBox="0 0 40 58"><path d="M15,2 h10 v10 c8,4 12,10 12,20 v18 a6,6 0 0 1 -6,6 h-22 a6,6 0 0 1 -6,-6 v-18 c0,-10 4,-16 12,-20 z"/></svg>`;
+  return `<div class="phone"><div class="status"></div>
+    <div class="topbar">${icon.menu}<h4>収集</h4><span style="width:22px"></span></div>
+    <div class="screen"><div class="shapes">${shapes}</div>
+      <div class="shelf"><span class="cap">コレクション</span>${bottle(0)}${bottle(1)}${bottle(1)}${bottle(1)}</div>
+    </div>${nav('collect')}</div>`;
+}
+
+document.getElementById('styles').innerHTML = STYLES.map(s => `
+  <section class="style-block ${s.id}">
+    <header><h2>${s.name}</h2><div class="tag">${s.tag}</div></header>
+    <div class="row">${connectPhone()}${collectPhone(s.id)}
+      <div class="notes">
+        <h3>配色</h3><div class="swatches">${s.colors.map(([c,n]) => `<div class="sw" style="background:${c}"><span>${n}</span></div>`).join('')}</div>
+        <h3>フォント</h3><div>${s.font}</div>
+        <h3>角の丸さ</h3><div>${s.corner}</div>
+        <h3>動き（3 案共通）</h3><div>キビキビ短く。線はすっと引かれて止まる。形は小さくゆれるだけ。影はぼかさず、ずらした単色。</div>
+        <h3>裏世界（オーロラ）— 色帯で表現</h3>
+        <div class="ura">${s.ura.map(c => `<i style="background:${c}"></i>`).join('')}<b>裏世界</b></div>
+      </div></div>
+  </section>`).join('');
+</script>
+</body>
+</html>
