@@ -4,3 +4,4 @@ dist/
 *.local
 .claude/
 docs/source/
+design/jar-test/

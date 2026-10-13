@@ -241,9 +241,11 @@
 .bottle-theme { font-size: 20px; word-break: break-all; }
 .bottle-stage { flex: 1 1 0; min-height: 160px; display: grid; place-items: center; overflow: hidden; }
 .bottle-box { position: relative; }
-.bottle-glass, .bottle-front { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.bottle-img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-select: none; }
 .bottle-layer { position: absolute; top: 0; left: 0; transform-origin: 0 0; touch-action: none; }
 .bottle-item { position: absolute; top: 0; left: 0; will-change: transform; }
 .bottle-item .sticker { pointer-events: none; }
 .bottle-foot { flex: 0 0 auto; display: flex; flex-direction: column; gap: 8px; }
 .bottle-hint { text-align: center; }
+.bottle-pic { position: relative; display: block; }
+.bottle-pic img { position: absolute; inset: 0; width: 100%; height: 100%; }

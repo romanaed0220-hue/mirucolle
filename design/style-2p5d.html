@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ミルコレ 2.5D 比較</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1A1A1A; --paper: #FFFDF6; --yellow: #FFD23F; --yellow-d: #D9A800;
+    --pink: #FF8FB1; --pink-d: #D9638A; --teal: #3DCCC7; --teal-d: #23A19C; --lilac: #B79CFF; --lilac-d: #8D6FE0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #ECEAE4; font-family: "M PLUS Rounded 1c", sans-serif; color: var(--ink); padding: 28px 16px 60px; }
+  h1 { font-family: "Dela Gothic One"; font-weight: 400; font-size: 22px; max-width: 1180px; margin: 0 auto 6px; }
+  .lead { max-width: 1180px; margin: 0 auto 24px; font-size: 13px; color: #555; line-height: 1.8; }
+  .cols { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+  .col { background: var(--paper); border-radius: 18px; padding: 22px 20px 26px; overflow: hidden; }
+  .col h2 { font-family: "Dela Gothic One"; font-weight: 400; font-size: 18px; }
+  .col .note { font-size: 12px; color: #666; line-height: 1.7; margin: 6px 0 18px; min-height: 60px; }
+  .label { font-size: 11px; font-weight: 800; color: #888; letter-spacing: .08em; margin: 18px 0 10px; }
+
+  /* ---- mini card ---- */
+  .card { width: 230px; background: #fff; border: 2px solid var(--ink); border-radius: 16px; overflow: hidden; }
+  .card .photo { height: 120px; background: #8CCBF2 url(../public/samples/sky.svg) center/cover; border-bottom: 2px solid var(--ink); }
+  .card .body { padding: 10px 12px 12px; }
+  .card .q { font-family: "Dela Gothic One"; font-size: 13px; }
+  .card .mark { display: inline-block; margin-top: 6px; background: var(--yellow); font-size: 10px; font-weight: 800; padding: 1px 4px; }
+  .btn { display: inline-block; margin-top: 10px; padding: 8px 18px; border: 2px solid var(--ink); border-radius: 12px; background: var(--yellow); font-weight: 800; font-size: 13px; }
+
+  /* A: 今の硬い影 */
+  .A .card { box-shadow: 5px 5px 0 var(--ink); }
+  .A .btn { box-shadow: 3px 3px 0 var(--ink); }
+
+  /* B: 正面はそのまま、右下に側面を押し出す（側面は同じ色の濃いめ） */
+  .B .card { box-shadow:
+      1px 1px 0 #DCDCDC, 2px 2px 0 #DCDCDC, 3px 3px 0 #DCDCDC, 4px 4px 0 #DCDCDC, 5px 5px 0 #DCDCDC, 6px 6px 0 #DCDCDC,
+      7px 7px 0 var(--ink), 8px 8px 0 var(--ink); }
+  .B .btn { box-shadow:
+      1px 1px 0 var(--yellow-d), 2px 2px 0 var(--yellow-d), 3px 3px 0 var(--yellow-d), 4px 4px 0 var(--yellow-d),
+      5px 5px 0 var(--ink), 6px 6px 0 var(--ink); }
+
+  /* C: 厳密なアイソメトリック（画面ごと 30° の面に乗せる） */
+  .C .stage { height: 250px; display: grid; place-items: center; }
+  .C .iso { transform: rotateX(55deg) rotateZ(-45deg); transform-style: preserve-3d; }
+  .C .card { box-shadow:
+      1px 1px 0 #DCDCDC, 2px 2px 0 #DCDCDC, 3px 3px 0 #DCDCDC, 4px 4px 0 #DCDCDC, 5px 5px 0 #DCDCDC, 6px 6px 0 #DCDCDC,
+      7px 7px 0 #DCDCDC, 8px 8px 0 #DCDCDC, 9px 9px 0 var(--ink), 10px 10px 0 var(--ink); }
+
+  /* ---- shapes ---- */
+  .shapes { display: flex; gap: 14px; align-items: flex-end; height: 120px; }
+  .shapes svg { overflow: visible; }
+
+  /* ---- jar ---- */
+  .jar { position: relative; width: 240px; height: 352px; margin: 4px auto 0; }
+  .jar > img, .jar > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<h1>2.5D の比較</h1>
+<p class="lead">同じ中身（つながりのカード・ボタン・形・瓶）を 3 つの描き方で。写真はすべて仮のイラスト。瓶は Blender で描いたもの（A・B は少し見下ろし、C はアイソメトリックの角度）。</p>
+
+<div class="cols" id="cols"></div>
+
+<script>
+// 形（写真で切り抜いた輪郭）。座標は 100×100
+const SHAPES = [
+  { photo: 'sky', d: 'M8,58 C14,38 38,30 58,36 C70,26 84,24 92,32 C86,38 82,42 80,48 C86,58 78,76 58,76 C38,82 16,74 8,58 Z', eye: [[26, 52]], side: '#9CB8C8' },
+  { photo: 'wood', d: 'M18,32 L25,8 L40,24 C46,22 54,22 60,24 L75,8 L82,32 C93,47 90,73 72,86 C58,96 40,96 26,86 C10,73 7,47 18,32 Z', eye: [[36, 52], [62, 52]], side: '#A86F44' },
+  { photo: 'wall', d: 'M50,8 C76,8 93,28 91,53 C89,79 70,94 48,92 C24,90 8,72 10,48 C12,24 27,8 50,8 Z', eye: [[36, 46], [62, 46]], side: '#9C8B76' },
+];
+const SHADOW = ['var(--pink)', 'var(--teal)', 'var(--lilac)'];
+
+// A：平面のステッカー＋色のずらし影
+function shapeA(s, i, size) {
+  const id = `a${i}${size}`;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
+    <defs><clipPath id="${id}"><path d="${s.d}"/></clipPath></defs>
+    <path d="${s.d}" fill="${SHADOW[i]}" stroke="#1A1A1A" stroke-width="2.5" transform="translate(5 6)" vector-effect="non-scaling-stroke"/>
+    <image href="../public/samples/${s.photo}.svg" x="-10" y="-10" width="120" height="120" preserveAspectRatio="xMidYMid slice" clip-path="url(#${id})"/>
+    <path d="${s.d}" fill="none" stroke="#1A1A1A" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+    ${s.eye.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="#1A1A1A"/>`).join('')}
+  </svg>`;
+}
+
+// B / C：厚みのある塊（側面を右下に押し出す）
+function shapeB(s, i, size, depth = 9) {
+  const id = `b${i}${size}${depth}`;
+  const k = 100 / size; // 1px あたりの単位
+  const layers = Array.from({ length: depth }, (_, n) => depth - n)
+    .map((n) => `<path d="${s.d}" fill="${s.side}" transform="translate(${n * k} ${n * k})"/>`).join('');
+  return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
+    <defs><clipPath id="${id}"><path d="${s.d}"/></clipPath></defs>
+    <path d="${s.d}" fill="none" stroke="#1A1A1A" stroke-width="5" transform="translate(${depth * k} ${depth * k})" vector-effect="non-scaling-stroke"/>
+    ${layers}
+    <image href="../public/samples/${s.photo}.svg" x="-10" y="-10" width="120" height="120" preserveAspectRatio="xMidYMid slice" clip-path="url(#${id})"/>
+    <path d="${s.d}" fill="none" stroke="#1A1A1A" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+    ${s.eye.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="#1A1A1A"/>`).join('')}
+  </svg>`;
+}
+
+const card = `<div class="card"><div class="photo"></div><div class="body">
+  <div class="q">あなたには何に見えますか？</div><span class="mark">先に描く、それから見る</span><br>
+  <span class="btn">なぞってみる</span></div></div>`;
+
+function jar(dir, shapeFn, positions) {
+  return `<div class="jar">
+    <img src="jar-test/${dir}jar-soda-back.png">
+    ${positions.map(([x, y, sz, i]) => `<div style="position:absolute;left:${x}px;top:${y}px">${shapeFn(SHAPES[i], i, sz)}</div>`).join('')}
+    <img src="jar-test/${dir}jar-soda-front.png">
+  </div>`;
+}
+
+const inJarFlat = [[44, 248, 70, 1], [118, 252, 66, 2], [70, 190, 66, 0]];
+const inJarIso = [[52, 210, 66, 1], [120, 200, 62, 2], [84, 160, 60, 0]];
+
+document.getElementById('cols').innerHTML = `
+  <section class="col A">
+    <h2>A. 今の硬い影</h2>
+    <p class="note">平面の上に、色や黒の影をずらして置くだけ。いちばん軽くて、メンフィスそのもの。</p>
+    <p class="label">カードとボタン</p>${card}
+    <p class="label">形</p><div class="shapes">${SHAPES.map((s, i) => shapeA(s, i, 96)).join('')}</div>
+    <p class="label">瓶</p>${jar('', shapeA, inJarFlat)}
+  </section>
+  <section class="col B">
+    <h2>B. 側面を押し出した 2.5D</h2>
+    <p class="note">正面はそのまま（写真はゆがまない）、右下に同じ色の濃い側面。ボタンは押せる積木、形は厚みのある塊に。</p>
+    <p class="label">カードとボタン</p>${card}
+    <p class="label">形</p><div class="shapes">${SHAPES.map((s, i) => shapeB(s, i, 96)).join('')}</div>
+    <p class="label">瓶</p>${jar('', (s, i, sz) => shapeB(s, i, sz, 6), inJarFlat)}
+  </section>
+  <section class="col C">
+    <h2>C. 厳密なアイソメトリック</h2>
+    <p class="note">すべてを 30° の面に乗せる。立体感は強いが、カードの写真や形がななめにつぶれる。瓶は上から深く見下ろす角度になる。</p>
+    <p class="label">カードとボタン</p><div class="stage"><div class="iso">${card}</div></div>
+    <p class="label">形（地面に寝かせた場合）</p>
+    <div class="stage" style="height:140px"><div class="iso shapes">${SHAPES.map((s, i) => shapeB(s, i, 80)).join('')}</div></div>
+    <p class="label">瓶</p>${jar('iso/', (s, i, sz) => shapeB(s, i, sz, 6), inJarIso)}
+  </section>`;
+</script>
+</body>
+</html>
