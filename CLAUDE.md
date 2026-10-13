@@ -8,7 +8,7 @@
 3. `docs/05-dev-and-test-workflow.md` —— 开发、发布、测试流程
 4. `docs/04-open-questions-and-roadmap.md` —— 未定事项与实现顺序
 5. `docs/03-feedback-log.md` —— 背景，需要时查
-6. `docs/source/` —— 原始会议记录 PDF（语音转写，有识别错误，仅作核对）
+6. `docs/source/` —— 原始会议记录 PDF（语音转写，有识别错误，仅作核对）。**只在本地，不入库**（仓库是 Public，已 gitignore），不要提交它。
 
 ## 必须遵守（产品）
 - **「先に描く、それから見る」** 必须在界面和文案里显式出现。
