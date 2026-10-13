@@ -34,8 +34,9 @@ export function DrawCanvas(props: Props) {
   useLayoutEffect(() => {
     const el = stageRef.current!;
     const fit = () => {
-      const sw = el.clientWidth, sh = el.clientHeight;
-      if (!sw || !sh) return;
+      // 枠線（左右上下 2px）と影（4px）の分を引いて、はみ出さないようにする
+      const sw = el.clientWidth - 8, sh = el.clientHeight - 8;
+      if (sw <= 0 || sh <= 0) return;
       const a = propsRef.current.aspect;
       const w = Math.min(sw, sh * a);
       setBox({ w: Math.floor(w), h: Math.floor(w / a) });
@@ -162,7 +163,7 @@ export function DrawCanvas(props: Props) {
   const size = { width: `${box.w}px`, height: `${box.h}px` };
   return (
     <div class="draw-stage" ref={stageRef}>
-      <div class="draw-box" style={size}>
+      <div class="draw-box" style={{ width: `${box.w + 4}px`, height: `${box.h + 4}px` }}>
         <img src={props.photoURL} alt="" draggable={false} />
         <canvas ref={canvasRef} style={size} />
       </div>

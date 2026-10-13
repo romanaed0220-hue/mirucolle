@@ -1,5 +1,6 @@
 import { useState } from 'preact/hooks';
 import { Dots, HalfCircle, Ring, Squiggle } from '../components/Deco';
+import { Portal } from '../components/Portal';
 import { ShapeDetail } from '../components/ShapeDetail';
 import { hashOf, ShapeSticker } from '../components/ShapeSticker';
 import { takeLastAddedId, useAppState } from '../data/store';
@@ -75,7 +76,7 @@ export function CollectScreen() {
         </div>
       </div>
 
-      {open && <ShapeDetail shape={open} onClose={() => setOpen(null)} />}
+      {open && <Portal><ShapeDetail shape={open} onClose={() => setOpen(null)} /></Portal>}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'preact/hooks';
 import { Camera, Image as ImageIcon } from 'lucide-preact';
 import { Dots, Ring, Squiggle } from '../components/Deco';
+import { Portal } from '../components/Portal';
 import { compressPhoto } from '../data/photos';
 import { RecordFlow, type PickedPhoto } from './RecordFlow';
 
@@ -73,7 +74,7 @@ export function RecordScreen() {
         <input ref={albumRef} type="file" accept="image/*" hidden onChange={onPick} />
       </div>
 
-      {photo && <RecordFlow photo={photo} onClose={closeFlow} />}
+      {photo && <Portal><RecordFlow photo={photo} onClose={closeFlow} /></Portal>}
     </div>
   );
 }

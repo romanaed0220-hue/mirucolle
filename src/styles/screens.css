@@ -56,20 +56,24 @@
 
 /* ---------- 記録フロー（全画面） ---------- */
 .flow {
-  position: fixed; top: 0; bottom: 0; left: 0; right: 0; z-index: 20;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  height: 100vh; /* dvh 非対応ブラウザ用 */
+  height: 100dvh;
+  overflow: hidden;
   max-width: var(--app-max); margin: 0 auto;
   background: var(--bg);
   display: flex; flex-direction: column;
   padding: calc(var(--safe-top) + 10px) 16px calc(var(--safe-bottom) + 14px);
   gap: 10px;
 }
-.flow-head { display: flex; align-items: center; gap: 12px; }
+.flow-head { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+.flow-hint { flex: 0 0 auto; }
 .flow-steps { list-style: none; display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; font-weight: 800; }
 .flow-steps li { padding: 3px 9px; border: var(--border); border-radius: 999px; background: var(--surface); color: var(--muted); border-style: dashed; }
 .flow-steps li.done { color: var(--ink); border-style: solid; }
 .flow-steps li.on { background: var(--accent); color: var(--on-accent); border-style: solid; box-shadow: var(--hard-sm); }
 .flow-hint { font-weight: 700; min-height: 1.7em; }
-.flow-foot { display: flex; gap: 10px; }
+.flow-foot { display: flex; gap: 10px; flex: 0 0 auto; position: relative; z-index: 2; }
 .flow-foot > .btn { flex: 1; }
 .flow-foot.detail { flex-direction: column; }
 .flow-foot-row { display: flex; gap: 10px; }
@@ -83,7 +87,7 @@
 }
 .name-input:focus { outline: none; box-shadow: var(--hard-sm); }
 
-.draw-stage { flex: 1; min-height: 0; display: grid; place-items: center; }
+.draw-stage { flex: 1 1 0; min-height: 120px; display: grid; place-items: center; overflow: hidden; position: relative; }
 .draw-box { position: relative; border: var(--border); border-radius: var(--r-md); overflow: hidden; box-shadow: var(--hard); background: var(--surface); }
 .draw-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; user-select: none; -webkit-user-select: none; pointer-events: none; }
 .draw-box canvas { position: absolute; inset: 0; touch-action: none; cursor: crosshair; }
