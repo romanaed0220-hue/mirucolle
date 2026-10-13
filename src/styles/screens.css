@@ -254,3 +254,13 @@
 .bottle-foot .flow-foot .btn { flex: 1; }
 .btn.danger { color: #C2410C; border-color: #C2410C; background: var(--surface); }
 .edit-foot .btn.danger { flex: 0 0 auto; }
+/* 瓶をタップしたときのふるえ（コマ送り） */
+.bottle-box.shaking { animation: jar-shake .32s steps(1) both; }
+@keyframes jar-shake {
+  0% { transform: translate(0, 0) rotate(0); }
+  20% { transform: translate(-5px, 0) rotate(-2deg); }
+  40% { transform: translate(5px, -2px) rotate(2deg); }
+  60% { transform: translate(-3px, 0) rotate(-1deg); }
+  80% { transform: translate(2px, 0) rotate(1deg); }
+  100% { transform: none; }
+}

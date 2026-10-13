@@ -5,11 +5,11 @@
  * 瓶の内側の線（src/config/jar.json）に沿って置くので、絵と当たり判定がずれない。
  * - 開くと、形が口から 1 つずつ落ちてくる
  * - スマホを傾けると重力の向きが変わる（iOS の許可は、瓶を開いたタップの中で取る：lib/orientation.ts）
- * - 指でつまんで動かせる／「ふる」でゆらせる
+ * - 指でつまんで動かせる／瓶をタップするとゆれる
  */
 import { useEffect, useRef, useState } from 'preact/hooks';
 import Matter from 'matter-js';
-import { Pencil, Trash2, Waves, X } from 'lucide-preact';
+import { Pencil, Trash2, X } from 'lucide-preact';
 import { BOTTLE_MAX_SHAPES } from '../config/bottles';
 import JAR from '../config/jar.json';
 import type { Collection, Shape } from '../data/storage';
@@ -208,19 +208,30 @@ export function BottleView({ collection, shapes, allShapes, onSave, onDelete, on
     return () => window.removeEventListener('deviceorientation', onOrient);
   }, []);
 
+  const boxRef = useRef<HTMLDivElement>(null);
+  // 瓶をタップすると、ゆれる（中の形がはねる＋瓶が少しふるえる）
   const shake = () => {
     itemsRef.current.forEach(({ body: b, dropped }) => {
       if (!dropped) return;
       Body.setVelocity(b, { x: (Math.random() - 0.5) * 12, y: -5 - Math.random() * 7 });
       Body.setAngularVelocity(b, (Math.random() - 0.5) * 0.35);
     });
+    const box = boxRef.current;
+    if (box) {
+      box.classList.remove('shaking');
+      void box.offsetWidth; // アニメーションを最初からやり直す
+      box.classList.add('shaking');
+    }
   };
+  const shakeRef = useRef(shake);
+  shakeRef.current = shake;
 
-  // 指でつまんで動かす（つまむ点は瓶の内側に制限）
+  // 指の操作：形をつまんで動かす（つまむ点は瓶の内側に制限）／瓶を軽くタップしたらゆらす
   useEffect(() => {
     const layer = layerRef.current;
     if (!layer) return;
     let grab: { id: number; c: Matter.Constraint } | null = null;
+    let tap: { id: number; x: number; y: number; t: number; moved: boolean } | null = null;
     const raw = (e: PointerEvent) => {
       const r = layer.getBoundingClientRect();
       const s = scaleRef.current || 1;
@@ -232,25 +243,32 @@ export function BottleView({ collection, shapes, allShapes, onSave, onDelete, on
     });
     const down = (e: PointerEvent) => {
       const engine = engineRef.current;
-      if (!engine || grab) return;
+      if (!engine || tap) return;
+      e.preventDefault();
+      tap = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), moved: false };
+      try { layer.setPointerCapture(e.pointerId); } catch { /* 合成イベント */ }
       const bodies = [...itemsRef.current.values()].filter((it) => it.dropped).map((it) => it.body);
       const hit = Query.point(bodies, raw(e))[0];
       if (!hit) return;
-      e.preventDefault();
-      try { layer.setPointerCapture(e.pointerId); } catch { /* 合成イベント */ }
       const c = Constraint.create({ pointA: clampInside(raw(e)), bodyB: hit, pointB: { x: 0, y: 0 }, stiffness: 0.08, damping: 0.1, length: 0 });
       Composite.add(engine.world, c);
       grab = { id: e.pointerId, c };
     };
     const move = (e: PointerEvent) => {
-      if (!grab || grab.id !== e.pointerId) return;
+      if (!tap || tap.id !== e.pointerId) return;
       e.preventDefault();
-      grab.c.pointA = clampInside(raw(e));
+      if (Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 8) tap.moved = true;
+      if (grab) grab.c.pointA = clampInside(raw(e));
     };
     const up = (e: PointerEvent) => {
-      if (!grab || grab.id !== e.pointerId) return;
-      if (engineRef.current) Composite.remove(engineRef.current.world, grab.c);
-      grab = null;
+      if (!tap || tap.id !== e.pointerId) return;
+      const wasTap = !tap.moved && performance.now() - tap.t < 350 && e.type === 'pointerup';
+      tap = null;
+      if (grab) {
+        if (engineRef.current) Composite.remove(engineRef.current.world, grab.c);
+        grab = null;
+      }
+      if (wasTap) shakeRef.current();
     };
     layer.addEventListener('pointerdown', down);
     layer.addEventListener('pointermove', move);
@@ -275,7 +293,7 @@ export function BottleView({ collection, shapes, allShapes, onSave, onDelete, on
       </header>
 
       <div class="bottle-stage" ref={stageRef}>
-        <div class="bottle-box" style={{ width: `${size.w}px`, height: `${size.h}px` }}>
+        <div class="bottle-box" ref={boxRef} style={{ width: `${size.w}px`, height: `${size.h}px` }}>
           <img class="bottle-img" src={IMG(`jar-${style}-back`)} alt="" draggable={false} />
           <div class="bottle-layer" ref={layerRef} style={{ width: `${VW}px`, height: `${VH}px`, transform: `scale(${scale})` }}>
             {shapes.map((s) => {
@@ -296,13 +314,12 @@ export function BottleView({ collection, shapes, allShapes, onSave, onDelete, on
 
       <footer class="bottle-foot">
         <p class="small muted bottle-hint">
-          {tilting ? 'スマホを傾けると、形が転がります。' : '指でつまんで動かせます。'}
+          {tilting ? '傾けると転がります。瓶をタップすると、ゆれます。' : '指でつまんで動かせます。瓶をタップすると、ゆれます。'}
         </p>
         <div class="flow-foot">
           <button class="btn" onClick={() => setEditing(true)}>
             <Pencil size={18} strokeWidth={2.4} />編集
           </button>
-          <button class="btn primary" onClick={shake}><Waves size={18} strokeWidth={2.4} />ふる</button>
         </div>
       </footer>
 
