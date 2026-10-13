@@ -4,7 +4,6 @@ import { BottomNav } from './components/BottomNav';
 import { Drawer } from './components/Drawer';
 import { TopBar } from './components/TopBar';
 import { href, useRoute, type Route } from './router';
-import { loadState, recordOpen, saveState } from './data/storage';
 import { RecordScreen } from './screens/RecordScreen';
 import { CollectScreen } from './screens/CollectScreen';
 import { ConnectScreen } from './screens/ConnectScreen';
@@ -15,10 +14,6 @@ const TITLES: Record<Route, string> = { record: '記録', collect: '収集', con
 export function App() {
   const route = useRoute();
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  useEffect(() => {
-    saveState(recordOpen(loadState()));
-  }, []);
 
   useEffect(() => setDrawerOpen(false), [route]);
 

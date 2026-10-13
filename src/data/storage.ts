@@ -3,11 +3,28 @@
  * 構造を変えるときは SCHEMA_VERSION を上げて migrations に変換関数を足す。
  * テスターの既存データを消さないための仕組み（docs/01-app-spec.md 7.3）。
  *
- * 写真などの大きいデータはここに入れない（IndexedDB 側で扱う）。
+ * 写真などの大きいデータはここに入れない（photos.ts / IndexedDB 側で扱う）。
  */
 import { STORAGE_PREFIX } from '../config/env';
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
+
+/** 写真上の座標。写真の幅・高さを 1 とした割合（0〜1） */
+export type Point = [number, number];
+
+export interface Shape {
+  id: string;
+  createdAt: string;
+  name: string;
+  /** IndexedDB の写真キー */
+  photoId: string;
+  /** 写真の縦横比（幅 / 高さ） */
+  aspect: number;
+  /** なぞった閉じた輪郭 */
+  outline: Point[];
+  /** 描き足した線（目・手足など）。1 本ずつの配列 */
+  details: Point[][];
+}
 
 export interface AppState {
   version: typeof SCHEMA_VERSION;
@@ -15,15 +32,20 @@ export interface AppState {
   firstOpenedAt: string;
   /** アプリを開いた日（YYYY-MM-DD、重複なし）。使用記録エクスポート用 */
   openedDays: string[];
+  /** 自分の形（新しい順） */
+  shapes: Shape[];
 }
 
 const KEY = `${STORAGE_PREFIX}:state`;
 
 // from バージョン → from+1 バージョンへの変換。例：migrations[1] は v1 → v2
-const migrations: Record<number, (s: any) => any> = {};
+const migrations: Record<number, (s: any) => any> = {
+  // v2：形（shapes）を追加
+  1: (s) => ({ ...s, shapes: [] }),
+};
 
 function initialState(): AppState {
-  return { version: SCHEMA_VERSION, firstOpenedAt: new Date().toISOString(), openedDays: [] };
+  return { version: SCHEMA_VERSION, firstOpenedAt: new Date().toISOString(), openedDays: [], shapes: [] };
 }
 
 function migrate(raw: any): AppState {
