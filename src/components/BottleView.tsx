@@ -9,7 +9,7 @@
  */
 import { useEffect, useRef, useState } from 'preact/hooks';
 import Matter from 'matter-js';
-import { Plus, Waves, X } from 'lucide-preact';
+import { Pencil, Trash2, Waves, X } from 'lucide-preact';
 import { BOTTLE_MAX_SHAPES } from '../config/bottles';
 import JAR from '../config/jar.json';
 import type { Collection, Shape } from '../data/storage';
@@ -75,13 +75,14 @@ type Props = {
   collection: Collection;
   /** この瓶に入っている形 */
   shapes: Shape[];
-  /** まだこの瓶に入っていない自分の形（「形を入れる」の候補） */
-  addable: Shape[];
-  onAdd: (shapeIds: string[]) => void;
+  /** 自分の形すべて（編集で入れる・取り出すの候補） */
+  allShapes: Shape[];
+  onSave: (patch: { theme: string; shapeIds: string[] }) => void;
+  onDelete: () => void;
   onClose: () => void;
 };
 
-export function BottleView({ collection, shapes, addable, onAdd, onClose }: Props) {
+export function BottleView({ collection, shapes, allShapes, onSave, onDelete, onClose }: Props) {
   const style = collection.bottleId;
   const [stageRef, size] = useFit<HTMLDivElement>(VW / VH);
   const scale = size.w / VW;
@@ -93,8 +94,7 @@ export function BottleView({ collection, shapes, addable, onAdd, onClose }: Prop
   const scaleRef = useRef(scale);
   scaleRef.current = scale;
   const [tilting, setTilting] = useState(false);
-  const [picking, setPicking] = useState(false);
-  const room = BOTTLE_MAX_SHAPES - shapes.length;
+  const [editing, setEditing] = useState(false);
 
   // 形の大きさは、瓶に入った時点の個数で決めて、あとから変えない（中で急に大きさが変わらないように）
   const sizeOf = (s: Shape) => {
@@ -148,10 +148,16 @@ export function BottleView({ collection, shapes, addable, onAdd, onClose }: Prop
     };
   }, []);
 
-  // 新しく入った形を、口の上から 1 つずつ落とす（開いたときも、「形を入れる」のあとも）
+  // 新しく入った形を、口の上から 1 つずつ落とす（開いたときも、編集で入れたあとも）。取り出した形は消す
   useEffect(() => {
     const engine = engineRef.current;
     if (!engine) return;
+    const ids = new Set(shapes.map((s) => s.id));
+    itemsRef.current.forEach((it, id) => {
+      if (ids.has(id)) return;
+      Composite.remove(engine.world, it.body);
+      itemsRef.current.delete(id);
+    });
     const fresh = shapes.filter((s) => !itemsRef.current.has(s.id));
     if (fresh.length === 0) return;
 
@@ -293,43 +299,77 @@ export function BottleView({ collection, shapes, addable, onAdd, onClose }: Prop
           {tilting ? 'スマホを傾けると、形が転がります。' : '指でつまんで動かせます。'}
         </p>
         <div class="flow-foot">
-          <button class="btn" onClick={() => setPicking(true)} disabled={addable.length === 0 || room <= 0}>
-            <Plus size={18} strokeWidth={2.4} />形を入れる
+          <button class="btn" onClick={() => setEditing(true)}>
+            <Pencil size={18} strokeWidth={2.4} />編集
           </button>
           <button class="btn primary" onClick={shake}><Waves size={18} strokeWidth={2.4} />ふる</button>
         </div>
-        {addable.length === 0 && <p class="small muted bottle-hint">ほかの形は、もう全部この瓶に入っています。</p>}
-        {addable.length > 0 && room <= 0 && <p class="small muted bottle-hint">この瓶はいっぱいです。</p>}
       </footer>
 
-      {picking && (
-        <AddShapes
-          shapes={addable}
-          room={room}
-          onClose={() => setPicking(false)}
-          onAdd={(ids) => { setPicking(false); onAdd(ids); }}
+      {editing && (
+        <EditCollection
+          collection={collection}
+          allShapes={allShapes}
+          onClose={() => setEditing(false)}
+          onSave={(patch) => { setEditing(false); onSave(patch); }}
+          onDelete={onDelete}
         />
       )}
     </div>
   );
 }
 
-/** 瓶に入れる形を選ぶ */
-function AddShapes({ shapes, room, onAdd, onClose }: { shapes: Shape[]; room: number; onAdd: (ids: string[]) => void; onClose: () => void }) {
-  const [picked, setPicked] = useState<string[]>([]);
+const THEME_MAX = 24;
+
+/** 瓶の編集：テーマを変える・形を入れる／取り出す・瓶を消す */
+function EditCollection({ collection, allShapes, onSave, onDelete, onClose }: {
+  collection: Collection;
+  allShapes: Shape[];
+  onSave: (patch: { theme: string; shapeIds: string[] }) => void;
+  onDelete: () => void;
+  onClose: () => void;
+}) {
+  const [theme, setTheme] = useState(collection.theme);
+  // もう存在しない形の id は落としておく
+  const [picked, setPicked] = useState(collection.shapeIds.filter((id) => allShapes.some((s) => s.id === id)));
+  const full = picked.length >= BOTTLE_MAX_SHAPES;
   const toggle = (id: string) =>
-    setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : p.length >= room ? p : [...p, id]));
+    setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : full ? p : [...p, id]));
+  // 瓶に入っている形を先に並べる。並びは開いたときのまま（選ぶたびに並び替えない）
+  const [order] = useState(() =>
+    [...allShapes].sort((a, b) => Number(picked.includes(b.id)) - Number(picked.includes(a.id))).map((s) => s.id));
+  const shapesInOrder = order.map((id) => allShapes.find((s) => s.id === id)!).filter(Boolean);
+
+  const remove = () => {
+    if (!confirm(`コレクション「${collection.theme}」を消しますか？\n中の形は収集に残ります。`)) return;
+    onDelete();
+  };
+
   return (
-    <div class="flow add-shapes">
+    <div class="flow edit-collection">
       <header class="flow-head">
         <button class="icon-btn" aria-label="やめる" onClick={onClose}><X size={20} strokeWidth={2.4} /></button>
-        <h2 class="head add-title">瓶に形を入れる</h2>
+        <h2 class="head add-title">コレクションを編集</h2>
       </header>
-      <p class="flow-hint small">入れたい形を選んでください。</p>
-      <ShapePickGrid shapes={shapes} picked={picked} onToggle={toggle} />
-      <footer class="flow-foot">
-        <button class="btn primary" onClick={() => onAdd(picked)} disabled={picked.length === 0}>入れる</button>
+      <input
+        class="name-input"
+        type="text"
+        enterKeyHint="done"
+        maxLength={THEME_MAX}
+        placeholder="テーマ"
+        value={theme}
+        onInput={(e) => setTheme((e.currentTarget as HTMLInputElement).value)}
+      />
+      <p class="flow-hint small">
+        選んだ形が瓶に入ります。外すと取り出します。{full ? '（この瓶はいっぱいです）' : ''}
+      </p>
+      <ShapePickGrid shapes={shapesInOrder} picked={picked} onToggle={toggle} />
+      <footer class="flow-foot edit-foot">
+        <button class="btn danger" onClick={remove}><Trash2 size={18} strokeWidth={2.4} />瓶を消す</button>
+        <button class="btn primary" onClick={() => onSave({ theme: theme.trim() || collection.theme, shapeIds: picked })}
+          disabled={picked.length === 0}>保存する</button>
       </footer>
+      {picked.length === 0 && <p class="small muted">形を 1 つ以上選んでください。</p>}
     </div>
   );
 }

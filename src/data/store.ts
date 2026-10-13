@@ -49,15 +49,18 @@ export function setPosted(shapeId: string, posted: boolean) {
 }
 
 export function addCollection(c: Collection) {
-  update({ ...state, collections: [...state.collections, c] });
+  update({ ...state, collections: [...state.collections, c], publishCount: state.publishCount + 1 });
 }
 
-/** 既存のコレクション（瓶）に形を足す */
-export function addShapesToCollection(collectionId: string, shapeIds: string[]) {
+/** コレクション（瓶）を消す。中の形そのものは収集に残る */
+export function deleteCollection(collectionId: string) {
+  update({ ...state, collections: state.collections.filter((c) => c.id !== collectionId) });
+}
+
+/** コレクション（瓶）を編集する：テーマと中身の形 */
+export function updateCollection(collectionId: string, patch: { theme: string; shapeIds: string[] }) {
   update({
     ...state,
-    collections: state.collections.map((c) =>
-      c.id === collectionId ? { ...c, shapeIds: [...c.shapeIds, ...shapeIds.filter((id) => !c.shapeIds.includes(id))] } : c,
-    ),
+    collections: state.collections.map((c) => (c.id === collectionId ? { ...c, ...patch } : c)),
   });
 }

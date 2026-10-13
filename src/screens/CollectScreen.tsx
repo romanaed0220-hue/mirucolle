@@ -8,7 +8,7 @@ import { Dots, HalfCircle, Ring, Squiggle } from '../components/Deco';
 import { Portal } from '../components/Portal';
 import { ShapeDetail } from '../components/ShapeDetail';
 import { hashOf, ShapeSticker } from '../components/ShapeSticker';
-import { addCollection, addShapesToCollection, takeLastAddedId, useAppState } from '../data/store';
+import { addCollection, deleteCollection, takeLastAddedId, updateCollection, useAppState } from '../data/store';
 import type { Shape } from '../data/storage';
 import { requestOrientationPermission } from '../lib/orientation';
 import { href } from '../router';
@@ -25,11 +25,11 @@ function place(shape: Shape, i: number) {
 }
 
 export function CollectScreen() {
-  const { shapes, collections } = useAppState();
+  const { shapes, collections, publishCount } = useAppState();
   const [creating, setCreating] = useState(false);
   const [bottleOpenId, setBottleOpenId] = useState<string | null>(null);
   const bottleOpen = collections.find((c) => c.id === bottleOpenId) ?? null;
-  const lockedCount = BOTTLES.length - unlockedBottles(collections.length).length;
+  const lockedCount = BOTTLES.length - unlockedBottles(publishCount).length;
   const [openId, setOpenId] = useState<string | null>(null);
   const open = shapes.find((s) => s.id === openId) ?? null;
   const [newId] = useState(takeLastAddedId);
@@ -95,7 +95,7 @@ export function CollectScreen() {
         <Portal>
           <CollectionCreate
             shapes={shapes}
-            publishedCount={collections.length}
+            publishedCount={publishCount}
             onClose={() => setCreating(false)}
             onCreate={(c) => {
               requestOrientationPermission(); // 「発表する」のタップの中で傾きの許可を取る
@@ -111,8 +111,9 @@ export function CollectScreen() {
           <BottleView
             collection={bottleOpen}
             shapes={bottleOpen.shapeIds.map((id) => shapes.find((s) => s.id === id)).filter((s): s is Shape => !!s)}
-            addable={shapes.filter((s) => !bottleOpen.shapeIds.includes(s.id))}
-            onAdd={(ids) => addShapesToCollection(bottleOpen.id, ids)}
+            allShapes={shapes}
+            onSave={(patch) => updateCollection(bottleOpen.id, patch)}
+            onDelete={() => { deleteCollection(bottleOpen.id); setBottleOpenId(null); }}
             onClose={() => setBottleOpenId(null)}
           />
         </Portal>

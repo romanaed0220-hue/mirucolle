@@ -7,7 +7,7 @@
  */
 import { STORAGE_PREFIX } from '../config/env';
 
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 /** 写真上の座標。写真の幅・高さを 1 とした割合（0〜1） */
 export type Point = [number, number];
@@ -58,6 +58,8 @@ export interface AppState {
   myTraces: Record<string, MyTrace>;
   /** 発表したコレクション（古い順） */
   collections: Collection[];
+  /** これまでに発表した回数（瓶の解放に使う。コレクションを消しても減らない） */
+  publishCount: number;
 }
 
 const KEY = `${STORAGE_PREFIX}:state`;
@@ -72,10 +74,12 @@ const migrations: Record<number, (s: any) => any> = {
   3: (s) => s,
   // v5：コレクション（collections）を追加
   4: (s) => ({ ...s, collections: [] }),
+  // v6：発表した回数（publishCount）を追加。今あるコレクションの数から始める
+  5: (s) => ({ ...s, publishCount: (s.collections ?? []).length }),
 };
 
 function initialState(): AppState {
-  return { version: SCHEMA_VERSION, firstOpenedAt: new Date().toISOString(), openedDays: [], shapes: [], myTraces: {}, collections: [] };
+  return { version: SCHEMA_VERSION, firstOpenedAt: new Date().toISOString(), openedDays: [], shapes: [], myTraces: {}, collections: [], publishCount: 0 };
 }
 
 function migrate(raw: any): AppState {
