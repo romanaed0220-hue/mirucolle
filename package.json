@@ -11,10 +11,12 @@
   "dependencies": {
     "idb-keyval": "^6.3.0",
     "lucide-preact": "^1.56.0",
+    "matter-js": "^0.20.0",
     "preact": "^11.0.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",
+    "@types/matter-js": "^0.20.2",
     "typescript": "^7.0.2",
     "vite": "^8.3.4"
   }

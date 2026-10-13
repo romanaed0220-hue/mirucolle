@@ -1,22 +1,16 @@
 import { useState } from 'preact/hooks';
+import { Plus } from 'lucide-preact';
+import { BottleIcon } from '../components/BottleIcon';
+import { BottleView } from '../components/BottleView';
+import { CollectionCreate } from '../components/CollectionCreate';
+import { BOTTLES, bottleById, unlockedBottles } from '../config/bottles';
 import { Dots, HalfCircle, Ring, Squiggle } from '../components/Deco';
 import { Portal } from '../components/Portal';
 import { ShapeDetail } from '../components/ShapeDetail';
 import { hashOf, ShapeSticker } from '../components/ShapeSticker';
-import { takeLastAddedId, useAppState } from '../data/store';
+import { addCollection, takeLastAddedId, useAppState } from '../data/store';
 import type { Shape } from '../data/storage';
 import { href } from '../router';
-
-const BOTTLE = 'M15,2 h10 v10 c8,4 12,10 12,20 v18 a6,6 0 0 1 -6,6 h-22 a6,6 0 0 1 -6,-6 v-18 c0,-10 4,-16 12,-20 z';
-
-function Bottle({ locked }: { locked?: boolean }) {
-  return (
-    <svg class="bottle" viewBox="0 0 40 58" aria-hidden="true">
-      <path d={BOTTLE} fill={locked ? 'none' : 'var(--c-teal)'} stroke={locked ? 'var(--muted)' : 'var(--line)'}
-        stroke-width="2" stroke-dasharray={locked ? '4 3' : undefined} />
-    </svg>
-  );
-}
 
 // 形をばらばらに散らす配置（id から決まるので毎回同じ位置）
 const ROW = 118;
@@ -30,7 +24,11 @@ function place(shape: Shape, i: number) {
 }
 
 export function CollectScreen() {
-  const { shapes } = useAppState();
+  const { shapes, collections } = useAppState();
+  const [creating, setCreating] = useState(false);
+  const [bottleOpenId, setBottleOpenId] = useState<string | null>(null);
+  const bottleOpen = collections.find((c) => c.id === bottleOpenId) ?? null;
+  const lockedCount = BOTTLES.length - unlockedBottles(collections.length).length;
   const [openId, setOpenId] = useState<string | null>(null);
   const open = shapes.find((s) => s.id === openId) ?? null;
   const [newId] = useState(takeLastAddedId);
@@ -73,11 +71,48 @@ export function CollectScreen() {
       <div class="shelf">
         <span class="chip shelf-cap">コレクション</span>
         <div class="shelf-row">
-          <Bottle locked /><Bottle locked /><Bottle locked /><Bottle locked />
+          {collections.map((c) => (
+            <button class="shelf-bottle" onClick={() => setBottleOpenId(c.id)} aria-label={`コレクション「${c.theme}」をひらく`}>
+              <BottleIcon style={bottleById(c.bottleId)} />
+              <span class="shelf-label">{c.theme}</span>
+            </button>
+          ))}
+          <button class="shelf-bottle make" onClick={() => setCreating(true)} disabled={shapes.length === 0}
+            aria-label="コレクションをつくる">
+            <span class="shelf-plus"><BottleIcon empty /><Plus size={18} strokeWidth={3} /></span>
+            <span class="shelf-label">つくる</span>
+          </button>
+          {Array.from({ length: lockedCount }, () => (
+            <span class="shelf-bottle" aria-hidden="true"><BottleIcon locked /><span class="shelf-label">&nbsp;</span></span>
+          ))}
         </div>
+        {shapes.length === 0 && <p class="small muted shelf-note">形を記録すると、コレクションをつくれます。</p>}
       </div>
 
       {open && <Portal><ShapeDetail shape={open} onClose={() => setOpenId(null)} /></Portal>}
+      {creating && (
+        <Portal>
+          <CollectionCreate
+            shapes={shapes}
+            publishedCount={collections.length}
+            onClose={() => setCreating(false)}
+            onCreate={(c) => {
+              addCollection(c);
+              setCreating(false);
+              setBottleOpenId(c.id);
+            }}
+          />
+        </Portal>
+      )}
+      {bottleOpen && (
+        <Portal>
+          <BottleView
+            collection={bottleOpen}
+            shapes={bottleOpen.shapeIds.map((id) => shapes.find((s) => s.id === id)).filter((s): s is Shape => !!s)}
+            onClose={() => setBottleOpenId(null)}
+          />
+        </Portal>
+      )}
     </div>
   );
 }

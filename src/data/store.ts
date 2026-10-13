@@ -1,6 +1,6 @@
 // アプリ全体の状態。画面をまたいで共有し、変更のたびに localStorage へ保存する。
 import { useEffect, useState } from 'preact/hooks';
-import { loadState, recordOpen, saveState, type AppState, type MyTrace, type Shape } from './storage';
+import { loadState, recordOpen, saveState, type AppState, type Collection, type MyTrace, type Shape } from './storage';
 
 let state: AppState = recordOpen(loadState());
 saveState(state);
@@ -46,4 +46,8 @@ export function setPosted(shapeId: string, posted: boolean) {
     ...state,
     shapes: state.shapes.map((s) => (s.id === shapeId ? { ...s, postedAt: posted ? new Date().toISOString() : undefined } : s)),
   });
+}
+
+export function addCollection(c: Collection) {
+  update({ ...state, collections: [...state.collections, c] });
 }
