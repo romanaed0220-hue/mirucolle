@@ -1,0 +1,76 @@
+/*
+ * デザイントークン（メンフィス）。色はすべてここで定義し、コンポーネントでは var() だけを使う。
+ * テーマ切替（点数で買える主題色・裏世界）は [data-theme] で上書きする。
+ * グラデーションは使わない（docs/01-app-spec.md 7.4）。
+ */
+:root {
+  /* palette */
+  --c-ink: #1A1A1A;
+  --c-paper: #FFFDF6;
+  --c-white: #FFFFFF;
+  --c-yellow: #FFD23F;
+  --c-pink: #FF8FB1;
+  --c-teal: #3DCCC7;
+  --c-lilac: #B79CFF;
+  --c-blue: #3A6FF7;
+  --c-gray: #6B6B6B;
+
+  /* semantic */
+  --bg: var(--c-paper);
+  --surface: var(--c-white);
+  --ink: var(--c-ink);
+  --muted: var(--c-gray);
+  --line: var(--c-ink);
+  --accent: var(--c-yellow);
+  --on-accent: var(--c-ink);
+  --nav-active: var(--c-pink);
+  --tag: var(--c-teal);
+  --highlight: var(--c-yellow);
+  --page-outside: #F2F0EA;
+
+  /* deco colors（背景モチーフ） */
+  --deco-1: var(--c-pink);
+  --deco-2: var(--c-teal);
+  --deco-3: var(--c-yellow);
+  --deco-4: var(--c-lilac);
+  --deco-5: var(--c-blue);
+
+  /* shape */
+  --border-w: 2px;
+  --border: var(--border-w) solid var(--line);
+  --hard: 4px 4px 0 var(--line);
+  --hard-sm: 3px 3px 0 var(--line);
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+
+  /* type */
+  --font-head: "Dela Gothic One", "Hiragino Sans", sans-serif;
+  --font-body: "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif;
+
+  /* layout */
+  --app-max: 480px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* 裏世界：地を濃紫に反転、同じモチーフを発光色で */
+[data-theme="ura"] {
+  --bg: #2A1E5C;
+  --surface: #3A2C78;
+  --ink: #FFFFFF;
+  --muted: #C9C1EE;
+  --line: #FFFFFF;
+  --accent: #5CF2C8;
+  --on-accent: #1A1A1A;
+  --nav-active: #FF8FB1;
+  --tag: #5CF2C8;
+  --highlight: #5CF2C8;
+  --hard: 4px 4px 0 #120B33;
+  --hard-sm: 3px 3px 0 #120B33;
+  --deco-1: #FF8FB1;
+  --deco-2: #5CF2C8;
+  --deco-3: #FFD23F;
+  --deco-4: #B79CFF;
+  --deco-5: #6FA0FF;
+}

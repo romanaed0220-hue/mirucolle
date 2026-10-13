@@ -1,23 +1,30 @@
-# ミルコレ（パレイドリア／見立て App）—— 交给 Claude Code 的交付包
+# ミルコレ（パレイドリア／見立て App）
 
+先に描く、それから見る。日常の「何かに見える」瞬間を、指でなぞった「形」として集める手机网页 App（毕业设计）。
+
+- 测试者用：`https://<GitHub 用户名>.github.io/mirucolle/`（`main` 分支）
+- 作者自测用：`https://<GitHub 用户名>.github.io/mirucolle/dev/`（`dev` 分支）
+
+## 本地开发
+```bash
+npm install
+npm run dev      # 本地预览（--host：同一 Wi-Fi 的手机也能打开，但相机/陀螺仪需要 HTTPS，要用 /dev/ 网址测）
+npm run build    # 类型检查 + 构建到 dist/
 ```
-pareidolia-app-handoff/
-├── CLAUDE.md                          Claude Code 的工作指引（放在项目根目录即自动加载）
-├── README.md                          本文件
-└── docs/
-    ├── 01-app-spec.md                 完整需求规格（概念、屏幕、功能、技术、验证）
-    ├── 02-design-principles.md        硬性约束、已否决方向、措辞规则
-    ├── 03-feedback-log.md             四次会议的反馈与设计演变
-    ├── 04-open-questions-and-roadmap.md  未定事项、调研项、实现路线、验收要点
-    ├── 05-dev-and-test-workflow.md    发布链路、分支、真机测试与测试期节奏
-    └── source/                        原始会议记录 PDF（进捗1/2/3、中間発表）
+
+## 目录
+```
+src/
+  main.tsx, app.tsx, router.ts   入口、画面切换（hash 路由）
+  screens/                       記録・収集・つながり・裏世界
+  components/                    顶栏、底部导航、マイページ抽屉、背景几何装饰
+  data/storage.ts                本地保存（带版本号与迁移）
+  config/env.ts                  环境（prod / dev / local）与保存前缀
+  styles/tokens.css              设计 token（メンフィス配色、裏世界主题）
+public/                          manifest、图标
+design/                          视觉风格比较页（G＝メンフィス 为采用案）
+docs/                            规格与流程（改需求先改这里）
+.github/workflows/deploy.yml     push 到 main/dev 时自动发布到 GitHub Pages
 ```
 
-## 使用方式
-1. 解压后在该文件夹里启动 Claude Code。
-2. 第一句可以直接说：「读完 CLAUDE.md 和 docs/，按 04 里的路线先搭骨架和发布链路，并先给我 2–3 个视觉风格方向。」
-
-## 注意
-- 技术约定已改为：纯静态前端（不再要求单文件）、手机真机 + GitHub Pages 测试，详见规格第 7 节。
-- 旧版 HTML 原型（図鑑概念，已废弃）和玻璃瓶物理 demo 的代码**不在本包内**，它们只出现在 Project 的对话里。新概念要求重建，从头实现即可；想参考的话请额外放进 `reference/` 目录（见规格 7.6）。
-- 会议记录为语音转写，存在识别错误；规格文档里已对明显错误做了解释并标注【假设】。
+技术：Vite + Preact + TypeScript，Lucide 图标。注意 Preact 11 的内联 `style` 不会给数字自动加 `px`，尺寸写在 CSS 里。

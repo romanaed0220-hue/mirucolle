@@ -1,0 +1,86 @@
+# main と dev を両方ビルドして、1 つの GitHub Pages サイトにまとめて公開する
+#   main → https://<user>.github.io/mirucolle/      （テスター用）
+#   dev  → https://<user>.github.io/mirucolle/dev/  （作者の実機確認用）
+# どちらのブランチに push しても、両方を最新で作り直す。
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+
+      - name: Check out dev (if it exists)
+        id: devcheck
+        run: |
+          if git ls-remote --exit-code --heads "https://github.com/${{ github.repository }}.git" dev; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.devcheck.outputs.exists == 'true'
+        with:
+          ref: dev
+          path: dev
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build main
+        working-directory: main
+        env:
+          VITE_APP_ENV: prod
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build dev
+        if: steps.devcheck.outputs.exists == 'true'
+        working-directory: dev
+        env:
+          VITE_APP_ENV: dev
+        run: |
+          npm ci
+          npm run build
+
+      - name: Assemble site
+        run: |
+          mkdir -p site
+          cp -R main/dist/. site/
+          if [ -d dev/dist ]; then
+            mkdir -p site/dev
+            cp -R dev/dist/. site/dev/
+          fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
