@@ -51,3 +51,13 @@ export function setPosted(shapeId: string, posted: boolean) {
 export function addCollection(c: Collection) {
   update({ ...state, collections: [...state.collections, c] });
 }
+
+/** 既存のコレクション（瓶）に形を足す */
+export function addShapesToCollection(collectionId: string, shapeIds: string[]) {
+  update({
+    ...state,
+    collections: state.collections.map((c) =>
+      c.id === collectionId ? { ...c, shapeIds: [...c.shapeIds, ...shapeIds.filter((id) => !c.shapeIds.includes(id))] } : c,
+    ),
+  });
+}

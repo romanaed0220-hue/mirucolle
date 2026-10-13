@@ -1,11 +1,11 @@
 // コレクションをつくる：形を選ぶ → テーマと瓶を決めて発表する。
 import { useState } from 'preact/hooks';
-import { Check, Lock, X } from 'lucide-preact';
+import { Lock, X } from 'lucide-preact';
 import { BOTTLE_MAX_SHAPES, BOTTLES, unlockedBottles } from '../config/bottles';
 import type { Collection, Shape } from '../data/storage';
 import { newId } from '../lib/path';
 import { BottleIcon } from './BottleIcon';
-import { ShapeSticker } from './ShapeSticker';
+import { ShapePickGrid } from './ShapePickGrid';
 
 const THEME_MAX = 24;
 
@@ -49,18 +49,7 @@ export function CollectionCreate({ shapes, publishedCount, onCreate, onClose }: 
       {step === 'pick' ? (
         <>
           <p class="flow-hint small">瓶に入れたい形を選んでください。</p>
-          <div class="pick-grid">
-            {shapes.map((s) => {
-              const on = picked.includes(s.id);
-              return (
-                <button class={`pick${on ? ' on' : ''}`} aria-pressed={on} onClick={() => toggle(s.id)}>
-                  <ShapeSticker shape={s} maxSide={84} uid={`p-${s.id}`} />
-                  <span class="pick-name">{s.name}</span>
-                  {on && <span class="pick-check"><Check size={14} strokeWidth={3} /></span>}
-                </button>
-              );
-            })}
-          </div>
+          <ShapePickGrid shapes={shapes} picked={picked} onToggle={toggle} />
           <footer class="flow-foot">
             <button class="btn primary" onClick={() => setStep('theme')} disabled={picked.length === 0}>次へ</button>
           </footer>

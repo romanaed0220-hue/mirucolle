@@ -8,7 +8,7 @@ import { Dots, HalfCircle, Ring, Squiggle } from '../components/Deco';
 import { Portal } from '../components/Portal';
 import { ShapeDetail } from '../components/ShapeDetail';
 import { hashOf, ShapeSticker } from '../components/ShapeSticker';
-import { addCollection, takeLastAddedId, useAppState } from '../data/store';
+import { addCollection, addShapesToCollection, takeLastAddedId, useAppState } from '../data/store';
 import type { Shape } from '../data/storage';
 import { requestOrientationPermission } from '../lib/orientation';
 import { href } from '../router';
@@ -111,6 +111,8 @@ export function CollectScreen() {
           <BottleView
             collection={bottleOpen}
             shapes={bottleOpen.shapeIds.map((id) => shapes.find((s) => s.id === id)).filter((s): s is Shape => !!s)}
+            addable={shapes.filter((s) => !bottleOpen.shapeIds.includes(s.id))}
+            onAdd={(ids) => addShapesToCollection(bottleOpen.id, ids)}
             onClose={() => setBottleOpenId(null)}
           />
         </Portal>
