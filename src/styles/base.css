@@ -15,7 +15,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 /* ---------- app shell ---------- */
 .app {
   position: relative;
-  height: 100dvh;
+  height: 100vh;
+  height: var(--vh, 100dvh);
   max-width: var(--app-max);
   margin: 0 auto;
   display: flex;
