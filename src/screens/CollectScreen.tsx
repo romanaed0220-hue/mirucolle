@@ -10,6 +10,7 @@ import { ShapeDetail } from '../components/ShapeDetail';
 import { hashOf, ShapeSticker } from '../components/ShapeSticker';
 import { addCollection, takeLastAddedId, useAppState } from '../data/store';
 import type { Shape } from '../data/storage';
+import { requestOrientationPermission } from '../lib/orientation';
 import { href } from '../router';
 
 // 形をばらばらに散らす配置（id から決まるので毎回同じ位置）
@@ -72,7 +73,7 @@ export function CollectScreen() {
         <span class="chip shelf-cap">コレクション</span>
         <div class="shelf-row">
           {collections.map((c) => (
-            <button class="shelf-bottle" onClick={() => setBottleOpenId(c.id)} aria-label={`コレクション「${c.theme}」をひらく`}>
+            <button class="shelf-bottle" onClick={() => { requestOrientationPermission(); setBottleOpenId(c.id); }} aria-label={`コレクション「${c.theme}」をひらく`}>
               <BottleIcon style={bottleById(c.bottleId)} />
               <span class="shelf-label">{c.theme}</span>
             </button>
@@ -97,6 +98,7 @@ export function CollectScreen() {
             publishedCount={collections.length}
             onClose={() => setCreating(false)}
             onCreate={(c) => {
+              requestOrientationPermission(); // 「発表する」のタップの中で傾きの許可を取る
               addCollection(c);
               setCreating(false);
               setBottleOpenId(c.id);
