@@ -2,11 +2,16 @@
 import { useState } from 'preact/hooks';
 import { RotateCcw, Undo2, X } from 'lucide-preact';
 import { DrawCanvas } from '../components/DrawCanvas';
-import type { Point } from '../data/storage';
+import type { PlacedSticker, Point } from '../data/storage';
+import { useAppState } from '../data/store';
+import { DecorateStep } from './DecorateStep';
 import { DEFAULT_PEN, type PenStyle } from '../lib/pen';
 import { PenBar } from './PenBar';
 
-export type TraceResult = { outline: Point[]; details: Point[][]; name: string; outlinePen?: PenStyle; detailPens?: PenStyle[] };
+export type TraceResult = {
+  outline: Point[]; details: Point[][]; name: string; outlinePen?: PenStyle; detailPens?: PenStyle[];
+  stickers?: PlacedSticker[]; card?: string;
+};
 
 const NAME_MAX = 20;
 
@@ -18,14 +23,19 @@ type Props = {
   /** つながりの「先に描く」用：輪郭をなぞるだけで保存（描き足し・名前なし） */
   outlineOnly?: boolean;
   saveLabel?: string;
+  /** 記録：最後に「かざる」（シール・カード）を入れる */
+  decorate?: boolean;
   /** チャレンジ参加中のときのお題（例：お正月のお題「ひつじ」） */
   topic?: string;
   onSave: (r: TraceResult) => Promise<void>;
   onClose: () => void;
 };
 
-export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLabel = '保存する', topic, onSave, onClose }: Props) {
-  const [step, setStep] = useState<'trace' | 'detail'>('trace');
+export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLabel = '保存する', decorate, topic, onSave, onClose }: Props) {
+  const [step, setStep] = useState<'trace' | 'detail' | 'decorate'>('trace');
+  const { equipped } = useAppState();
+  const [stickers, setStickers] = useState<PlacedSticker[]>([]);
+  const [card, setCard] = useState(equipped.card ?? '');
   const [outline, setOutline] = useState<Point[] | null>(null);
   const [tooSmall, setTooSmall] = useState(false);
   const [details, setDetails] = useState<Point[][]>([]);
@@ -52,6 +62,7 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLab
       await onSave({
         outline, details, name: outlineOnly ? "" : name.trim() || "なまえのない形",
         ...(outlineOnly ? {} : { outlinePen, detailPens }),
+        ...(decorate ? { stickers, card } : {}),
       });
     } catch (e) {
       console.error(e);
@@ -67,7 +78,8 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLab
         <ol class="flow-steps" aria-label="ステップ">
           {showTakeStep && <li class="done">撮る</li>}
           <li class={step === 'trace' ? 'on' : 'done'}>なぞる</li>
-          {!outlineOnly && <li class={step === "detail" ? "on" : ""}>描き足す・名付ける</li>}
+          {!outlineOnly && <li class={step === 'detail' ? 'on' : step === 'decorate' ? 'done' : ''}>描き足す・名付ける</li>}
+          {decorate && <li class={step === 'decorate' ? 'on' : ''}>かざる</li>}
         </ol>
       </header>
 
@@ -79,11 +91,18 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLab
             : tooSmall
             ? 'もう少し大きく、ぐるっと一周囲んでみてください。'
             : '見えた形を、指でぐるっと一周なぞってください。'
-          : '目や口、手足などを描き足して、名前をつけましょう。'}
+          : step === 'detail'
+          ? '目や口、手足などを描き足して、名前をつけましょう。'
+          : 'シールを貼ったり、投稿したときのカードを選んだり。しなくても大丈夫です。'}
       </p>
 
-      {!outlineOnly && <PenBar pen={pen} onChange={changePen} />}
+      {!outlineOnly && step !== 'decorate' && <PenBar pen={pen} onChange={changePen} />}
 
+      {step === 'decorate' && outline ? (
+        <DecorateStep photoURL={photoURL} aspect={aspect} outline={outline} details={details}
+          outlinePen={outlinePen} detailPens={detailPens}
+          stickers={stickers} onStickers={setStickers} card={card} onCard={setCard} />
+      ) : (
       <DrawCanvas
         photoURL={photoURL}
         aspect={aspect}
@@ -99,8 +118,14 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLab
         }}
         onDetail={(pts) => { setDetails((d) => [...d, pts]); setDetailPens((p) => [...p, pen]); }}
       />
+      )}
 
-      {step === 'trace' ? (
+      {step === 'decorate' ? (
+        <footer class="flow-foot">
+          <button class="btn" onClick={() => setStep('detail')}><Undo2 size={18} strokeWidth={2.4} />もどる</button>
+          <button class="btn primary" onClick={save} disabled={saving}>{saving ? '保存中…' : saveLabel}</button>
+        </footer>
+      ) : step === 'trace' ? (
         <footer class="flow-foot">
           <button class="btn" onClick={() => { setOutline(null); setTooSmall(false); }} disabled={!outline}>
             <RotateCcw size={18} strokeWidth={2.4} />やり直す
@@ -127,7 +152,11 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLab
             <button class="btn" onClick={() => (details.length ? (setDetails((d) => d.slice(0, -1)), setDetailPens((p) => p.slice(0, -1))) : setStep('trace'))}>
               <Undo2 size={18} strokeWidth={2.4} />{details.length ? '一つ戻す' : 'なぞり直す'}
             </button>
-            <button class="btn primary" onClick={save} disabled={saving}>{saving ? '保存中…' : saveLabel}</button>
+            {decorate ? (
+              <button class="btn primary" onClick={() => setStep('decorate')}>次へ</button>
+            ) : (
+              <button class="btn primary" onClick={save} disabled={saving}>{saving ? '保存中…' : saveLabel}</button>
+            )}
           </div>
         </footer>
       )}

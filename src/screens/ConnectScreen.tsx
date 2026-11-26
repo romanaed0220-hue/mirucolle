@@ -22,6 +22,8 @@ function ownItems(shapes: Shape[]): FeedItem[] {
       kind: 'view',
       photo: '',
       ownPhotoId: s.photoId,
+      stickers: s.stickers,
+      card: s.card,
       aspect: s.aspect,
       trace: { id: s.id, name: s.name, outline: s.outline, details: s.details, outlinePen: s.outlinePen, detailPens: s.detailPens },
     }));

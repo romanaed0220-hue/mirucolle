@@ -9,7 +9,7 @@
  * - ask ：「先に描く、それから見る」。描くまでは写真と問いかけだけ（ときどき混ざる）
  * - odai：今月のお題。いつも 1 枚目。ask と同じく、描くとほかの人の見え方がひらく
  */
-import type { Point } from '../data/storage';
+import type { PlacedSticker, Point } from '../data/storage';
 import type { PenStyle } from '../lib/pen';
 
 export type SampleTrace = { id: string; name: string; outline: Point[]; details: Point[][]; outlinePen?: PenStyle; detailPens?: PenStyle[] };
@@ -20,6 +20,9 @@ export type ViewItem = Base & {
   trace: SampleTrace;
   /** 自分が投稿した形のとき：写真は IndexedDB のこのキー（photo は空） */
   ownPhotoId?: string;
+  /** 自分の投稿：写真に貼ったシールと、カードの縁どり（'' はいつもの） */
+  stickers?: PlacedSticker[];
+  card?: string;
 };
 export type AskItem = Base & { kind: 'ask'; traces: SampleTrace[] };
 export type OdaiItem = Base & { kind: 'odai'; odaiTitle: string; traces: SampleTrace[] };

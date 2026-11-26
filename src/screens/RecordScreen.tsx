@@ -120,8 +120,9 @@ export function RecordScreen() {
             showTakeStep
             topic={forChallenge && challenge ? `${challenge.label}「${challenge.theme}」` : undefined}
             saveLabel={forChallenge ? '参加する' : undefined}
+            decorate={!forChallenge}
             onClose={closeFlow}
-            onSave={async ({ outline, details, name, outlinePen, detailPens }) => {
+            onSave={async ({ outline, details, name, outlinePen, detailPens, stickers, card }) => {
               const id = newId();
               await savePhoto(id, photo.blob);
               if (forChallenge && challenge) {
@@ -134,7 +135,7 @@ export function RecordScreen() {
                 setDoneId(challenge.id);
                 return;
               }
-              addShape({ id, createdAt: new Date().toISOString(), name, photoId: id, aspect: photo.width / photo.height, outline, details, outlinePen, detailPens });
+              addShape({ id, createdAt: new Date().toISOString(), name, photoId: id, aspect: photo.width / photo.height, outline, details, outlinePen, detailPens, stickers, card });
               closeFlow();
               location.hash = href('collect');
             }}

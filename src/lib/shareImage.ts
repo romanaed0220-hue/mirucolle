@@ -2,6 +2,7 @@
 import type { Shape } from '../data/storage';
 import { tracePath } from './path';
 import { strokeWithPen, type PenStyle } from './pen';
+import { stickerImage } from './stickerImage';
 
 const WIDTH = 1080;
 const BAND = 170;
@@ -36,6 +37,25 @@ export async function makeShareImage(shape: Shape, photo: Blob): Promise<File> {
   };
   stroke(shape.outline, true, 8, shape.outlinePen);
   shape.details.forEach((d, i) => stroke(d, false, 11, shape.detailPens?.[i]));
+
+  // 写真に貼ったシール（写真の外にははみ出さない）
+  if (shape.stickers?.length) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, WIDTH, ph);
+    ctx.clip();
+    for (const st of shape.stickers) {
+      const im = await stickerImage(st.id);
+      if (!im) continue;
+      const w = st.s * WIDTH, hh = (w * im.naturalHeight) / im.naturalWidth;
+      ctx.save();
+      ctx.translate(st.x * WIDTH, st.y * ph);
+      ctx.rotate((st.r * Math.PI) / 180);
+      ctx.drawImage(im, -w / 2, -hh / 2, w, hh);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
 
   // 下の帯
   ctx.fillStyle = '#FFFDF6';

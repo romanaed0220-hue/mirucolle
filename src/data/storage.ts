@@ -8,10 +8,13 @@
 import { STORAGE_PREFIX } from '../config/env';
 import type { PenStyle } from '../lib/pen';
 
-export const SCHEMA_VERSION = 9;
+export const SCHEMA_VERSION = 10;
 
 /** 写真上の座標。写真の幅・高さを 1 とした割合（0〜1） */
 export type Point = [number, number];
+
+/** 写真に貼ったシール。x, y は中心（写真の幅・高さを 1 とした割合）、s は幅（写真の幅に対する割合）、r は回転（度） */
+export interface PlacedSticker { id: string; x: number; y: number; s: number; r: number }
 
 export interface Shape {
   id: string;
@@ -28,6 +31,10 @@ export interface Shape {
   /** 輪郭・描き足した線それぞれのペン（未設定＝くろ・ふつう） */
   outlinePen?: PenStyle;
   detailPens?: PenStyle[];
+  /** 写真に貼ったシール（投稿したときに見える） */
+  stickers?: PlacedSticker[];
+  /** つながりに投稿したときのカードの縁どり（config/shop.ts の id。'' はいつもの。未設定ならもちもので選んだもの） */
+  card?: string;
   /** つながりに投稿した日時（ISO）。未投稿なら undefined */
   postedAt?: string;
 }
@@ -112,6 +119,8 @@ const migrations: Record<number, (s: any) => any> = {
   7: (s) => ({ ...s, owned: [], equipped: {} }),
   // v9：線ごとのペン（outlinePen / detailPens）。省略可なので既存データはそのまま
   8: (s) => s,
+  // v10：写真に貼るシール（stickers）とカード（card）。省略可なので既存データはそのまま
+  9: (s) => s,
 };
 
 function initialState(): AppState {

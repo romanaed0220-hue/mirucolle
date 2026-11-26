@@ -14,6 +14,7 @@ import { usePhotoURL } from '../data/photos';
 import { useAppState } from '../data/store';
 import { cardFrameClass } from './CardFrame';
 import { PenPath } from './PenPath';
+import { StickerLayer } from './StickerLayer';
 
 const COLORS = ['var(--c-pink)', 'var(--c-blue)', 'var(--c-teal)', 'var(--c-lilac)', 'var(--c-yellow)'];
 const INK = '#1A1A1A';
@@ -38,6 +39,7 @@ function Photo({ item, children }: { item: FeedItem; children?: preact.Component
       <div class="feed-photo" style={{ width: `${size.w}px`, height: `${size.h}px` }}>
         {src && <img src={src} alt="" draggable={false} />}
         {children}
+        {item.kind === 'view' && <StickerLayer items={item.stickers} />}
       </div>
     </div>
   );
@@ -56,9 +58,9 @@ export function FeedCard({ item, mine, onDraw, onNext }: Props) {
   // だれかの形をそのまま見るカード
   if (item.kind === 'view') {
     const t = item.trace;
-    // 自分の投稿だけ、交換所で選んだカードの縁どりにする
+    // 自分の投稿だけ、カードの縁どりにする（かざるで選んだもの。古い形はもちもので選んだもの）
     return (
-      <article class={`card feed-card${item.ownPhotoId ? cardFrameClass(equippedCard) : ''}`}>
+      <article class={`card feed-card${item.ownPhotoId ? cardFrameClass(item.card !== undefined ? item.card || undefined : equippedCard) : ''}`}>
         <Photo item={item}>{overlay(item.aspect, item.ownPhotoId ? (
           // 自分の投稿は、描いたときのペンのまま
           <>

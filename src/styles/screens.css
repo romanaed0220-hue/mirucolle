@@ -55,7 +55,7 @@
   overflow: hidden;
 }
 .feed-photo { position: relative; }
-.feed-photo img, .feed-photo svg { position: absolute; inset: 0; width: 100%; height: 100%; user-select: none; -webkit-user-select: none; pointer-events: none; }
+.feed-photo > img, .feed-photo > svg { position: absolute; inset: 0; width: 100%; height: 100%; user-select: none; -webkit-user-select: none; pointer-events: none; }
 .feed-tag { position: absolute; top: 12px; left: 12px; }
 .feed-body { flex: 0 0 auto; padding: 14px 16px 16px; }
 .feed-name { font-size: 20px; margin-top: 2px; }
@@ -155,7 +155,7 @@
 .detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .detail-name { font-size: 20px; word-break: break-all; }
 .detail-photo { position: relative; width: 100%; border: var(--border); border-radius: var(--r-md); overflow: hidden; background: var(--bg); }
-.detail-photo img, .detail-photo svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.detail-photo > img, .detail-photo > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 
 /* 詳細の「⋯」メニュー */
 .detail-tools { position: relative; display: flex; gap: 8px; flex: 0 0 auto; }
@@ -364,3 +364,30 @@
 .pen-kind { flex: 0 0 auto; padding: 5px 12px; border: var(--border); border-radius: 999px; background: var(--surface); color: var(--ink); font: inherit; font-size: 12px; font-weight: 800; white-space: nowrap; }
 .pen-kind.on { background: var(--accent); color: var(--on-accent); box-shadow: var(--hard-sm); }
 .pen-sample { width: 84px; height: auto; display: block; }
+
+/* ---------- シール（写真の上）・かざる ---------- */
+.sticker-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.sticker-layer.editable { pointer-events: auto; touch-action: none; }
+.placed { position: absolute; }
+.placed svg { display: block; width: 100%; height: auto; }
+.sticker-layer.editable .placed { cursor: grab; touch-action: none; }
+.placed.sel { outline: 2px dashed var(--c-ink); outline-offset: 4px; border-radius: 6px; }
+
+.decorate-stage { flex: 1; min-height: 0; display: grid; place-items: center; }
+.decorate-photo { position: relative; border: var(--border); border-radius: var(--r-md); overflow: hidden; box-shadow: var(--hard); background: var(--page-outside); }
+.decorate-photo > img, .decorate-photo > svg { position: absolute; inset: 0; width: 100%; height: 100%; user-select: none; -webkit-user-select: none; pointer-events: none; }
+.deco-panel { flex: 0 0 auto; display: flex; flex-direction: column; gap: 8px; }
+.deco-tabs { display: flex; gap: 8px; }
+.deco-tabs button { padding: 5px 14px; border: var(--border); border-radius: 999px; background: var(--surface); color: var(--ink); font: inherit; font-size: 13px; font-weight: 800; }
+.deco-tabs button.on { background: var(--ink); color: var(--bg); }
+.deco-tray { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 6px; }
+.deco-tray::-webkit-scrollbar { display: none; }
+.deco-item { flex: 0 0 auto; width: 60px; height: 60px; padding: 6px; border: var(--border); border-radius: var(--r-sm); background: var(--surface); display: grid; place-items: center; }
+.deco-item svg { width: 100%; height: auto; display: block; }
+.deco-card { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px; border: var(--border); border-radius: var(--r-sm); background: var(--surface); color: var(--ink); font: inherit; font-size: 11px; font-weight: 800; }
+.deco-card .mini-card { width: 40px; height: 52px; }
+.deco-card.on { background: var(--accent); color: var(--on-accent); box-shadow: var(--hard-sm); }
+.deco-empty { padding: 8px 2px; }
+.deco-tools { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.deco-tools-name { font-weight: 800; margin-right: auto; }
+.deco-done { padding: 8px 16px; }

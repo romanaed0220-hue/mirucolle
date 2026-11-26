@@ -8,6 +8,7 @@ import { setPosted } from '../data/store';
 import { toSvgPath } from '../lib/path';
 import { makeShareImage, shareOrDownload } from '../lib/shareImage';
 import { PenPath } from './PenPath';
+import { StickerLayer } from './StickerLayer';
 
 export function ShapeDetail({ shape, onClose }: { shape: Shape; onClose: () => void }) {
   const url = usePhotoURL(shape.photoId);
@@ -79,6 +80,7 @@ export function ShapeDetail({ shape, onClose }: { shape: Shape; onClose: () => v
               <PenPath d={toSvgPath(d, shape.aspect, 1, false)} pen={shape.detailPens?.[i]} base={5} halo={4} />
             ))}
           </svg>
+          <StickerLayer items={shape.stickers} />
         </div>
         {note && <p class="small detail-note">{note}</p>}
       </div>
