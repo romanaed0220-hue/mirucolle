@@ -7,7 +7,7 @@
  */
 import { STORAGE_PREFIX } from '../config/env';
 
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 
 /** 写真上の座標。写真の幅・高さを 1 とした割合（0〜1） */
 export type Point = [number, number];
@@ -46,6 +46,20 @@ export interface Collection {
   bottleId: string;
 }
 
+/** チャレンジ（お題）への参加作品。収集とは別に持つ（収集にも入れたら shapeId が入る） */
+export interface ChallengeEntry {
+  challengeId: string;
+  createdAt: string;
+  name: string;
+  /** IndexedDB の写真キー（B 主題型は自分の写真） */
+  photoId: string;
+  aspect: number;
+  outline: Point[];
+  details: Point[][];
+  /** 「収集にも入れる」を選んだときの形の id */
+  shapeId?: string;
+}
+
 export interface AppState {
   version: typeof SCHEMA_VERSION;
   /** 初回起動日時（ISO） */
@@ -60,6 +74,12 @@ export interface AppState {
   collections: Collection[];
   /** これまでに発表した回数（瓶の解放に使う。コレクションを消しても減らない） */
   publishCount: number;
+  /** チャレンジへの参加作品（古い順） */
+  challengeEntries: ChallengeEntry[];
+  /** もらったシールの id（config/stickers.ts） */
+  stickers: string[];
+  /** ポイント（本人にだけ見える。減らない／期限なし） */
+  points: number;
 }
 
 const KEY = `${STORAGE_PREFIX}:state`;
@@ -76,10 +96,12 @@ const migrations: Record<number, (s: any) => any> = {
   4: (s) => ({ ...s, collections: [] }),
   // v6：発表した回数（publishCount）を追加。今あるコレクションの数から始める
   5: (s) => ({ ...s, publishCount: (s.collections ?? []).length }),
+  // v7：チャレンジの参加作品・シール・ポイントを追加
+  6: (s) => ({ ...s, challengeEntries: [], stickers: [], points: 0 }),
 };
 
 function initialState(): AppState {
-  return { version: SCHEMA_VERSION, firstOpenedAt: new Date().toISOString(), openedDays: [], shapes: [], myTraces: {}, collections: [], publishCount: 0 };
+  return { version: SCHEMA_VERSION, firstOpenedAt: new Date().toISOString(), openedDays: [], shapes: [], myTraces: {}, collections: [], publishCount: 0, challengeEntries: [], stickers: [], points: 0 };
 }
 
 function migrate(raw: any): AppState {

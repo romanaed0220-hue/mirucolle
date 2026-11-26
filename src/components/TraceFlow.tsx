@@ -16,11 +16,13 @@ type Props = {
   /** つながりの「先に描く」用：輪郭をなぞるだけで保存（描き足し・名前なし） */
   outlineOnly?: boolean;
   saveLabel?: string;
+  /** チャレンジ参加中のときのお題（例：お正月のお題「ひつじ」） */
+  topic?: string;
   onSave: (r: TraceResult) => Promise<void>;
   onClose: () => void;
 };
 
-export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLabel = '保存する', onSave, onClose }: Props) {
+export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLabel = '保存する', topic, onSave, onClose }: Props) {
   const [step, setStep] = useState<'trace' | 'detail'>('trace');
   const [outline, setOutline] = useState<Point[] | null>(null);
   const [tooSmall, setTooSmall] = useState(false);
@@ -56,6 +58,7 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLab
         </ol>
       </header>
 
+      {topic && <p class="flow-topic small"><span class="chip challenge-chip">{topic}</span></p>}
       <p class="flow-hint small">
         {step === 'trace'
           ? outline

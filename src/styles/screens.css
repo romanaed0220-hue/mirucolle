@@ -260,3 +260,39 @@
   80% { transform: translate(2px, 0) rotate(1deg); }
   100% { transform: none; }
 }
+
+/* ---------- チャレンジ（お題） ---------- */
+.challenge-chip { background: var(--challenge); color: var(--c-ink); }
+.challenge-card {
+  position: relative;
+  padding: 16px 16px 14px;
+  background: var(--challenge);
+  box-shadow: 5px 5px 0 var(--c-ink);
+  overflow: hidden;
+}
+.challenge-card .challenge-chip { background: var(--challenge-sub); }
+.challenge-art { position: absolute; right: -6px; top: 4px; width: 118px; transform: rotate(8deg); pointer-events: none; }
+.challenge-art svg { display: block; width: 100%; height: auto; }
+.challenge-theme { font-size: 34px; margin-top: 8px; }
+.challenge-lead { margin-top: 6px; max-width: 62%; font-weight: 700; }
+.challenge-actions { display: flex; gap: 10px; margin-top: 14px; }
+.challenge-actions .btn { flex: 1; }
+.challenge-actions .btn:not(.primary) { flex: 0 0 auto; }
+.flow-topic { flex: 0 0 auto; }
+
+.challenge-done { overflow-y: auto; }
+.cd-body { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 18px; text-align: center; position: relative; }
+.cd-title { font-size: 26px; }
+.cd-work { display: flex; flex-direction: column; align-items: center; gap: 6px; animation: cd-pop .5s steps(5) both; }
+.cd-name { font-size: 18px; }
+.cd-reward { display: flex; align-items: center; gap: 12px; padding: 12px 16px; text-align: left; box-shadow: var(--hard-sm); animation: cd-pop .5s .35s steps(5) both; }
+.cd-sticker { width: 64px; flex: 0 0 auto; }
+.cd-sticker svg { display: block; width: 100%; height: auto; }
+.cd-reward-title { font-weight: 800; }
+.cd-foot { display: flex; flex-direction: column; gap: 10px; flex: 0 0 auto; position: relative; }
+@keyframes cd-pop { from { transform: scale(.6) rotate(-6deg); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.drawer-mine { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+.drawer-mine .mine-stickers { display: flex; gap: 6px; margin-left: auto; }
+.drawer-mine .mine-stickers svg { width: 36px; height: auto; display: block; }
+.dev-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; }

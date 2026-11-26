@@ -35,6 +35,10 @@
   --deco-4: var(--c-lilac);
   --deco-5: var(--c-blue);
 
+  /* チャレンジ（お題）の入口・チップ。お題ごとの配色はここを差し替える */
+  --challenge: #FF6B5B;
+  --challenge-sub: var(--c-yellow);
+
   /* shape */
   --border-w: 2px;
   --border: var(--border-w) solid var(--line);

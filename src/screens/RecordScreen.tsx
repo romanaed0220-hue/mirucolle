@@ -1,10 +1,13 @@
 import { useRef, useState } from 'preact/hooks';
 import { Camera, Image as ImageIcon } from 'lucide-preact';
 import { Dots, Ring, Squiggle } from '../components/Deco';
+import { ChallengeDone } from '../components/ChallengeDone';
 import { Portal } from '../components/Portal';
+import { StickerArt } from '../components/StickerArt';
 import { TraceFlow } from '../components/TraceFlow';
+import { activeThemeChallenge } from '../config/challenges';
 import { compressPhoto, savePhoto } from '../data/photos';
-import { addShape } from '../data/store';
+import { addShape, joinChallenge, useAppState } from '../data/store';
 import { newId } from '../lib/path';
 import { href } from '../router';
 
@@ -21,6 +24,19 @@ export function RecordScreen() {
   const albumRef = useRef<HTMLInputElement>(null);
   const [photo, setPhoto] = useState<PickedPhoto | null>(null);
   const [loading, setLoading] = useState(false);
+  const { challengeEntries } = useAppState();
+  // 開催中の B 主題型お題。参加したら入口は消える
+  const challenge = activeThemeChallenge();
+  const joined = !!challenge && challengeEntries.some((e) => e.challengeId === challenge.id);
+  /** いま選んでいる写真がお題への参加か */
+  const [forChallenge, setForChallenge] = useState(false);
+  const [doneId, setDoneId] = useState<string | null>(null);
+  const doneEntry = doneId ? challengeEntries.find((e) => e.challengeId === doneId) : undefined;
+
+  const pick = (ref: typeof cameraRef, challengeMode: boolean) => {
+    setForChallenge(challengeMode);
+    ref.current?.click();
+  };
 
   const onPick = async (e: Event) => {
     const input = e.currentTarget as HTMLInputElement;
@@ -51,6 +67,23 @@ export function RecordScreen() {
       <Ring x="84%" y="540px" s={36} color={2} />
 
       <div class="screen-inner record">
+        {challenge && !joined && (
+          <section class="card challenge-card" aria-label={challenge.label}>
+            <div class="challenge-art"><StickerArt id={challenge.reward.stickerId} /></div>
+            <span class="chip challenge-chip">{challenge.label}</span>
+            <h2 class="head challenge-theme">{challenge.theme}</h2>
+            <p class="small challenge-lead">{challenge.lead}</p>
+            <div class="challenge-actions">
+              <button class="btn primary" onClick={() => pick(cameraRef, true)} disabled={loading}>
+                <Camera size={18} strokeWidth={2.4} />撮って参加
+              </button>
+              <button class="btn" onClick={() => pick(albumRef, true)} disabled={loading} aria-label="アルバムから選んで参加">
+                <ImageIcon size={18} strokeWidth={2.4} />アルバム
+              </button>
+            </div>
+          </section>
+        )}
+
         <h2 class="head record-title">今日、何に<br />見えた？</h2>
 
         <ol class="steps">
@@ -66,10 +99,10 @@ export function RecordScreen() {
         </ol>
 
         <div class="record-actions">
-          <button class="btn primary block record-cta" onClick={() => cameraRef.current?.click()} disabled={loading}>
+          <button class="btn primary block record-cta" onClick={() => pick(cameraRef, false)} disabled={loading}>
             <Camera size={20} strokeWidth={2.4} />{loading ? '読み込み中…' : '写真を撮る'}
           </button>
-          <button class="btn block" onClick={() => albumRef.current?.click()} disabled={loading}>
+          <button class="btn block" onClick={() => pick(albumRef, false)} disabled={loading}>
             <ImageIcon size={18} strokeWidth={2.4} />アルバムから選ぶ
           </button>
         </div>
@@ -85,16 +118,31 @@ export function RecordScreen() {
             photoURL={photo.url}
             aspect={photo.width / photo.height}
             showTakeStep
+            topic={forChallenge && challenge ? `${challenge.label}「${challenge.theme}」` : undefined}
+            saveLabel={forChallenge ? '参加する' : undefined}
             onClose={closeFlow}
             onSave={async ({ outline, details, name }) => {
               const id = newId();
               await savePhoto(id, photo.blob);
+              if (forChallenge && challenge) {
+                // お題の作品は収集とは別に残す（収集にも入れるかは、このあと選ぶ）
+                joinChallenge(
+                  { challengeId: challenge.id, createdAt: new Date().toISOString(), name, photoId: id, aspect: photo.width / photo.height, outline, details },
+                  challenge.reward,
+                );
+                closeFlow();
+                setDoneId(challenge.id);
+                return;
+              }
               addShape({ id, createdAt: new Date().toISOString(), name, photoId: id, aspect: photo.width / photo.height, outline, details });
               closeFlow();
               location.hash = href('collect');
             }}
           />
         </Portal>
+      )}
+      {doneEntry && challenge && (
+        <Portal><ChallengeDone challenge={challenge} entry={doneEntry} onClose={() => setDoneId(null)} /></Portal>
       )}
     </div>
   );
