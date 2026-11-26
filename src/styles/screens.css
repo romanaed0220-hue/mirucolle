@@ -391,3 +391,12 @@
 .deco-tools { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; padding: 4px 0; }
 .deco-tools-name { font-weight: 800; margin-right: auto; }
 .deco-done { padding: 8px 16px; }
+
+/* ---------- このアプリについて ---------- */
+.about { display: flex; flex-direction: column; gap: 12px; padding-top: 18px; padding-bottom: 28px; }
+.about-card { padding: 14px; box-shadow: var(--hard-sm); }
+.about-card .muted { margin-top: 6px; }
+.about-h { font-size: 18px; margin-top: 8px; }
+.credits { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.credits li { display: flex; flex-direction: column; gap: 2px; padding-bottom: 10px; border-bottom: 1.5px dashed var(--line); }
+.credits a { color: var(--muted); word-break: break-all; display: inline-flex; align-items: center; gap: 4px; }

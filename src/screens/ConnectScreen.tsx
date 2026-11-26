@@ -4,11 +4,12 @@ import { CardStack } from '../components/CardStack';
 import { FeedCard } from '../components/FeedCard';
 import { Portal } from '../components/Portal';
 import { TraceFlow } from '../components/TraceFlow';
-import { FEED, type FeedItem } from '../config/feed';
+import { buildFeed, type FeedItem } from '../config/feed';
 import { setMyTrace, useAppState } from '../data/store';
 import type { Shape } from '../data/storage';
 
-// お題は必ず先頭（設定の並びに関係なく）
+// お題は必ず先頭（buildFeed が並べる）
+const FEED = buildFeed();
 const ODAI = FEED.filter((p) => p.kind === 'odai');
 const REST = FEED.filter((p) => p.kind !== 'odai');
 

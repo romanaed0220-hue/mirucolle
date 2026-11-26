@@ -33,7 +33,7 @@ export function Drawer({ onClose }: { onClose: () => void }) {
           <li><a href={href('items')}><Backpack size={20} />もちもの<ChevronRight class="go" size={18} strokeWidth={2.6} /></a></li>
           <li><CalendarHeart size={20} />月のふりかえり<span class="chip soon">準備中</span></li>
           <li><Settings size={20} />設定<span class="chip soon">準備中</span></li>
-          <li><Info size={20} />このアプリについて<span class="chip soon">準備中</span></li>
+          <li><a href={href('about')}><Info size={20} />このアプリについて<ChevronRight class="go" size={18} strokeWidth={2.6} /></a></li>
         </ul>
 
         {canForceChallenge && (
