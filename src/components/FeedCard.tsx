@@ -118,7 +118,6 @@ export function FeedCard({ item, mine, onDraw, onNext }: Props) {
           ))}
         </div>
         {others.length === 0 && <p class="small muted feed-first">この写真の、最初の見え方です。</p>}
-        {isOdai && <p class="small muted feed-first">お題の見え方は、裏世界に集まります。</p>}
         <button class="btn block feed-next" onClick={onNext}>次へ</button>
       </div>
     </article>

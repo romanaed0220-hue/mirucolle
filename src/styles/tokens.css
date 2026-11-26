@@ -1,6 +1,6 @@
 /*
  * デザイントークン（メンフィス）。色はすべてここで定義し、コンポーネントでは var() だけを使う。
- * テーマ切替（点数で買える主題色・裏世界）は [data-theme] で上書きする。
+ * テーマ切替（ポイントで買える主題色・チャレンジ配色）は [data-theme] で上書きする。
  * グラデーションは使わない（docs/01-app-spec.md 7.4）。
  */
 :root {
@@ -54,23 +54,3 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* 裏世界：地を濃紫に反転、同じモチーフを発光色で */
-[data-theme="ura"] {
-  --bg: #2A1E5C;
-  --surface: #3A2C78;
-  --ink: #FFFFFF;
-  --muted: #C9C1EE;
-  --line: #FFFFFF;
-  --accent: #5CF2C8;
-  --on-accent: #1A1A1A;
-  --nav-active: #FF8FB1;
-  --tag: #5CF2C8;
-  --highlight: #5CF2C8;
-  --hard: 4px 4px 0 #120B33;
-  --hard-sm: 3px 3px 0 #120B33;
-  --deco-1: #FF8FB1;
-  --deco-2: #5CF2C8;
-  --deco-3: #FFD23F;
-  --deco-4: #B79CFF;
-  --deco-5: #6FA0FF;
-}

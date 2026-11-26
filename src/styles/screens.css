@@ -81,10 +81,6 @@
 .is-revealed .ways { animation: reveal .4s steps(4) both; }
 @keyframes reveal { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
 
-/* ---------- 裏世界 ---------- */
-.ura-title { font-size: 22px; }
-.ura-text { margin-top: 10px; }
-.ura .chip { margin-top: 14px; }
 
 /* ---------- マイページ ---------- */
 .drawer-title { font-size: 20px; }

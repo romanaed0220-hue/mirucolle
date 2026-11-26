@@ -8,12 +8,10 @@ const ITEMS = [
 ] as const;
 
 export function BottomNav({ route }: { route: Route }) {
-  // 裏世界はつながりの中の場所なので、つながりを選択中として表示
-  const active: Route = route === 'ura' ? 'connect' : route;
   return (
     <nav class="nav">
       {ITEMS.map(({ route: r, label, Icon }) => (
-        <a href={href(r)} aria-current={active === r ? 'page' : undefined}>
+        <a href={href(r)} aria-current={route === r ? 'page' : undefined}>
           <span class="nav-ic"><Icon size={22} strokeWidth={2} /></span>
           {label}
         </a>

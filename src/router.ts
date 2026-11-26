@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'preact/hooks';
 
 // ハッシュルーティング：GitHub Pages のサブパスでもリロードで 404 にならない
-export type Route = 'record' | 'collect' | 'connect' | 'ura';
+export type Route = 'record' | 'collect' | 'connect';
 
-const ROUTES: Route[] = ['record', 'collect', 'connect', 'ura'];
+const ROUTES: Route[] = ['record', 'collect', 'connect'];
 export const DEFAULT_ROUTE: Route = 'record';
 
 function parse(hash: string): Route {

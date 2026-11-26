@@ -56,7 +56,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   box-shadow: var(--hard-sm);
 }
 .icon-btn:active { transform: translate(3px, 3px); box-shadow: none; }
-.icon-btn.ura { background: var(--c-lilac); color: var(--c-ink); }
 
 .screen {
   flex: 1;
