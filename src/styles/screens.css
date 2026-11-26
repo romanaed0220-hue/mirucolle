@@ -400,3 +400,22 @@
 .credits { list-style: none; display: flex; flex-direction: column; gap: 10px; }
 .credits li { display: flex; flex-direction: column; gap: 2px; padding-bottom: 10px; border-bottom: 1.5px dashed var(--line); }
 .credits a { color: var(--muted); word-break: break-all; display: inline-flex; align-items: center; gap: 4px; }
+
+/* ---------- 開発用：サンプルを描く ---------- */
+.dev-link { display: flex; align-items: center; gap: 8px; color: var(--muted); font-weight: 700; text-decoration: none; }
+.maker { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; padding-bottom: 28px; }
+.maker-intro { padding: 14px; }
+.maker-intro .muted { margin-top: 6px; }
+.maker-actions { display: flex; gap: 10px; }
+.maker-actions .btn.primary { flex: 1; }
+.maker-note { font-weight: 700; }
+.maker-grid { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.maker-item { padding: 8px; display: flex; flex-direction: column; gap: 6px; box-shadow: var(--hard-sm); }
+.maker-photo { position: relative; padding: 0; border: var(--border); border-radius: var(--r-sm); overflow: hidden; aspect-ratio: 1; background: var(--page-outside); }
+.maker-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.maker-kind { position: absolute; left: 6px; top: 6px; font-size: 10px; }
+.maker-pen { position: absolute; right: 6px; bottom: 6px; width: 30px; height: 30px; border-radius: 50%; border: var(--border); background: var(--accent); display: grid; place-items: center; }
+.maker-what { font-weight: 800; font-size: 13px; }
+.maker-traces { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.maker-traces li { display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding: 3px 4px 3px 8px; border: 1.5px solid var(--line); border-radius: 8px; }
+.maker-traces button { border: 0; background: none; padding: 2px; display: grid; place-items: center; color: var(--ink); }

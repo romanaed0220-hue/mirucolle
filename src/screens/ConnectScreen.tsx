@@ -7,11 +7,8 @@ import { TraceFlow } from '../components/TraceFlow';
 import { buildFeed, type FeedItem } from '../config/feed';
 import { setMyTrace, useAppState } from '../data/store';
 import type { Shape } from '../data/storage';
+import { loadMakerBook } from '../data/maker';
 
-// お題は必ず先頭（buildFeed が並べる）
-const FEED = buildFeed();
-const ODAI = FEED.filter((p) => p.kind === 'odai');
-const REST = FEED.filter((p) => p.kind !== 'odai');
 
 /** 投稿した自分の形を「見るだけ」のカードにする */
 function ownItems(shapes: Shape[]): FeedItem[] {
@@ -35,6 +32,10 @@ let savedIndex = 0;
 
 export function ConnectScreen() {
   const { myTraces, shapes } = useAppState();
+  // お題は必ず先頭（buildFeed が並べる）。開発版は「サンプルを描く」で描いたものも混ぜる
+  const [FEED] = useState(() => buildFeed(loadMakerBook()));
+  const ODAI = FEED.filter((p) => p.kind === 'odai');
+  const REST = FEED.filter((p) => p.kind !== 'odai');
   // 自分の投稿は、お題とほかの人の 2 枚のあとに混ぜる
   const ITEMS: FeedItem[] = [...ODAI, ...REST.slice(0, 2), ...ownItems(shapes), ...REST.slice(2)];
   const [index, setIndex] = useState(savedIndex);

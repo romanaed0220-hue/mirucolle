@@ -10,9 +10,11 @@ import { CollectScreen } from './screens/CollectScreen';
 import { ConnectScreen } from './screens/ConnectScreen';
 import { AboutScreen } from './screens/AboutScreen';
 import { ItemsScreen } from './screens/ItemsScreen';
+import { MakerScreen } from './screens/MakerScreen';
+import { canMakeSamples } from './data/maker';
 import { ShopScreen } from './screens/ShopScreen';
 
-const TITLES: Record<Route, string> = { record: '記録', collect: '収集', connect: 'つながり', shop: '交換所', items: 'もちもの', about: 'このアプリについて' };
+const TITLES: Record<Route, string> = { record: '記録', collect: '収集', connect: 'つながり', shop: '交換所', items: 'もちもの', about: 'このアプリについて', maker: 'サンプルを描く' };
 
 export function App() {
   const route = useRoute();
@@ -28,7 +30,7 @@ export function App() {
   }, [equipped.theme]);
 
   // 交換所・もちものはマイページから入る下層の画面なので、戻るボタンを出す
-  const sub = route === 'shop' || route === 'items' || route === 'about';
+  const sub = route === 'shop' || route === 'items' || route === 'about' || route === 'maker';
   const back = () => (history.length > 1 ? history.back() : (location.hash = href('record')));
 
   return (
@@ -41,6 +43,7 @@ export function App() {
       {route === 'shop' && <ShopScreen />}
       {route === 'items' && <ItemsScreen />}
       {route === 'about' && <AboutScreen />}
+      {route === 'maker' && canMakeSamples && <MakerScreen />}
       <BottomNav route={route} />
       {drawerOpen && <Drawer onClose={() => setDrawerOpen(false)} />}
     </div>

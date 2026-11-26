@@ -1,4 +1,5 @@
-import { Backpack, CalendarHeart, ChevronRight, Coins, Info, Settings, X } from 'lucide-preact';
+import { Backpack, CalendarHeart, ChevronRight, Coins, Info, PenTool, Settings, X } from 'lucide-preact';
+import { canMakeSamples } from '../data/maker';
 import { canForceChallenge, isChallengeForced, setChallengeForced } from '../config/challenges';
 import { APP_ENV, APP_VERSION } from '../config/env';
 import { useAppState } from '../data/store';
@@ -36,6 +37,9 @@ export function Drawer({ onClose }: { onClose: () => void }) {
           <li><a href={href('about')}><Info size={20} />このアプリについて<ChevronRight class="go" size={18} strokeWidth={2.6} /></a></li>
         </ul>
 
+        {canMakeSamples && (
+          <a class="dev-link small" href={href('maker')}><PenTool size={16} />開発用：サンプルを描く<ChevronRight size={16} strokeWidth={2.6} /></a>
+        )}
         {canForceChallenge && (
           <label class="dev-toggle muted">
             <input type="checkbox" checked={isChallengeForced()}
