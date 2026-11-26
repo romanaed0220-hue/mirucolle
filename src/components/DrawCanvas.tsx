@@ -216,7 +216,9 @@ export function DrawCanvas(props: Props) {
         const ok = l.pts.length >= 8 && b.w * r.width >= 40 && b.h * r.height >= 40;
         onOutline?.(ok ? l.pts : null, !ok);
       } else if (l.pts.length >= 1) {
-        onDetail?.(l.pts.length === 1 ? [l.pts[0], [round4(l.pts[0][0] + 0.002), l.pts[0][1]]] : l.pts);
+        // 1 回タップは点：少しだけずらした 2 点にする（右端では左へずらして 1 を超えないように）
+        const [x0, y0] = l.pts[0];
+        onDetail?.(l.pts.length === 1 ? [l.pts[0], [round4(x0 > 0.99 ? x0 - 0.002 : x0 + 0.002), y0]] : l.pts);
       }
       draw();
     };

@@ -16,7 +16,7 @@ export function MakerScreen() {
   const [book, setBook] = useState<TraceBook>(loadMakerBook);
   const [drawing, setDrawing] = useState<SamplePhoto | null>(null);
   const [note, setNote] = useState<string | null>(null);
-  const shipped = bundled as TraceBook;
+  const shipped = bundled as unknown as TraceBook;
   const total = Object.values(book).reduce((n, l) => n + l.length, 0);
 
   const exportFile = async () => {

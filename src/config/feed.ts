@@ -40,7 +40,7 @@ export type TraceBook = Record<string, SampleTrace[]>;
  *  - ask / odai：その写真の見え方を全部まとめて、描いたあとにひらく
  */
 export function buildFeed(extra: TraceBook = {}): FeedItem[] {
-  const book = bundled as TraceBook;
+  const book = bundled as unknown as TraceBook; // JSON は [x, y] を Point と推論できないので unknown 経由
   const tracesOf = (slug: string) => [...(book[slug] ?? []), ...(extra[slug] ?? [])];
   const head: FeedItem[] = [], body: FeedItem[] = [], tail: FeedItem[] = [];
   for (const p of SAMPLE_PHOTOS) {
