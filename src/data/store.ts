@@ -92,3 +92,22 @@ export function copyEntryToCollect(challengeId: string): string | null {
   });
   return shape.id;
 }
+
+/** 交換所でポイントと交換する。シールは stickers に、それ以外は owned に入る。足りなければ false */
+export function exchange(item: { id: string; category: string; price: number }): boolean {
+  if (state.points < item.price) return false;
+  const isSticker = item.category === 'sticker';
+  if (isSticker ? state.stickers.includes(item.id) : state.owned.includes(item.id)) return false;
+  update({
+    ...state,
+    points: state.points - item.price,
+    stickers: isSticker ? [...state.stickers, item.id] : state.stickers,
+    owned: isSticker ? state.owned : [...state.owned, item.id],
+  });
+  return true;
+}
+
+/** きせかえ・カードを使う（undefined でいつものに戻す） */
+export function equip(slot: 'theme' | 'card', id: string | undefined) {
+  update({ ...state, equipped: { ...state.equipped, [slot]: id } });
+}

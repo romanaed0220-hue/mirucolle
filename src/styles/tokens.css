@@ -3,7 +3,8 @@
  * テーマ切替（ポイントで買える主題色・チャレンジ配色）は [data-theme] で上書きする。
  * グラデーションは使わない（docs/01-app-spec.md 7.4）。
  */
-:root {
+:root,
+[data-theme="default"] { /* default：きせかえの見本で「いつもの」を見せるときに、外のテーマを打ち消す */
   /* palette */
   --c-ink: #1A1A1A;
   --c-paper: #FFFDF6;
@@ -58,3 +59,54 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+
+/* ---------- きせかえ（交換所で交換するテーマ。config/shop.ts の id） ---------- */
+/* たそがれ：夕方のオレンジと紫 */
+[data-theme="tasogare"] {
+  --bg: #FFF1E4;
+  --page-outside: #F7E2CF;
+  --accent: #FFA15C;
+  --highlight: #FFA15C;
+  --nav-active: #B79CFF;
+  --tag: #B79CFF;
+  --deco-1: #FF7A59;
+  --deco-2: #B79CFF;
+  --deco-3: #FFA15C;
+  --deco-4: #FF8FB1;
+  --deco-5: #6B4FD8;
+}
+/* はつゆき：白と水色 */
+[data-theme="hatsuyuki"] {
+  --bg: #F5F9FF;
+  --page-outside: #E4EEFA;
+  --accent: #9FD3FF;
+  --highlight: #9FD3FF;
+  --nav-active: #9FD3FF;
+  --tag: #C9E8FF;
+  --deco-1: #9FD3FF;
+  --deco-2: #C7C2FF;
+  --deco-3: #DDEFFF;
+  --deco-4: #8FB8E8;
+  --deco-5: #3A6FF7;
+}
+/* しんや：地を濃紺に反転、同じモチーフを明るい色で */
+[data-theme="shinya"] {
+  --bg: #1E2246;
+  --surface: #2C3163;
+  --ink: #FFFFFF;
+  --muted: #C3C6EC;
+  --line: #FFFFFF;
+  --accent: #FFD23F;
+  --on-accent: #1A1A1A;
+  --nav-active: #FF8FB1;
+  --tag: #3DCCC7;
+  --highlight: #FFD23F;
+  --page-outside: #161936;
+  --hard: 4px 4px 0 #0B0D22;
+  --hard-sm: 3px 3px 0 #0B0D22;
+  --deco-1: #FF8FB1;
+  --deco-2: #3DCCC7;
+  --deco-3: #FFD23F;
+  --deco-4: #B79CFF;
+  --deco-5: #6FA0FF;
+}

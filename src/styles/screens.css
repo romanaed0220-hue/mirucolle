@@ -292,7 +292,52 @@
 .cd-foot { display: flex; flex-direction: column; gap: 10px; flex: 0 0 auto; position: relative; }
 @keyframes cd-pop { from { transform: scale(.6) rotate(-6deg); opacity: 0; } to { transform: none; opacity: 1; } }
 
-.drawer-mine { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
-.drawer-mine .mine-stickers { display: flex; gap: 6px; margin-left: auto; }
-.drawer-mine .mine-stickers svg { width: 36px; height: auto; display: block; }
+.drawer-mine { display: flex; align-items: center; gap: 10px; padding: 12px 14px; color: inherit; text-decoration: none; box-shadow: var(--hard-sm); background: var(--accent); color: var(--on-accent); }
+.drawer-mine .mine-go { margin-left: auto; display: inline-flex; align-items: center; font-weight: 800; }
+
+/* ---------- 交換所・もちもの ---------- */
+.items-screen { display: flex; flex-direction: column; gap: 12px; padding-top: 18px; padding-bottom: 24px; }
+.points-card { display: flex; align-items: baseline; justify-content: space-between; padding: 14px 16px; background: var(--accent); color: var(--on-accent); box-shadow: var(--hard); }
+.points-num { font-size: 30px; }
+.cat-tabs { display: flex; gap: 8px; margin-top: 6px; }
+.cat-tabs button {
+  flex: 1; padding: 9px 0;
+  border: var(--border); border-radius: 999px;
+  background: var(--surface); color: var(--ink);
+  font: inherit; font-weight: 800; font-size: 14px;
+}
+.cat-tabs button.on { background: var(--ink); color: var(--bg); box-shadow: var(--hard-sm); }
+.item-grid { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
+.item { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 10px 12px; box-shadow: var(--hard-sm); }
+.item.using { outline: 3px solid var(--accent); outline-offset: 2px; }
+.item-pic { width: 84px; height: 84px; display: grid; place-items: center; }
+.item-pic > svg { width: 100%; height: auto; display: block; }
+.item-name { font-weight: 800; }
+.item-btn { padding: 6px 16px; font-size: 13px; }
+.item-state { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--muted); padding: 6px 0; }
+.item-state.on { color: var(--ink); }
+.items-empty { padding: 20px 4px; }
+.items-shop { margin-top: 8px; }
+
+/* きせかえの見本：data-theme を付けた要素の中だけテーマの色になる */
+.theme-sample { position: relative; width: 64px; height: 84px; border: var(--border); border-radius: 10px; background: var(--bg); overflow: hidden; }
+.theme-sample i { position: absolute; border-radius: 50%; }
+.theme-sample .ts-a { width: 26px; height: 26px; left: -6px; top: 8px; background: var(--deco-1); }
+.theme-sample .ts-b { width: 18px; height: 18px; right: 6px; top: 22px; background: var(--deco-2); }
+.theme-sample .ts-c { width: 22px; height: 22px; left: 22px; top: 40px; background: var(--deco-4); }
+.theme-sample .ts-btn { position: absolute; left: 8px; right: 8px; bottom: 8px; height: 14px; border: 1.5px solid var(--line); border-radius: 6px; background: var(--accent); }
+
+/* カードの縁どり：自分の投稿カード（つながり）と見本 */
+.mini-card { width: 64px; height: 84px; display: flex; flex-direction: column; overflow: hidden; border-radius: 10px; }
+.mini-stage { flex: 1; background: var(--page-outside); border-bottom: var(--border); }
+.mini-body { height: 26px; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+.mini-body i { height: 4px; border-radius: 2px; background: var(--muted); }
+.mini-body i + i { width: 60%; }
+[class*=" cs-"] { padding: 6px; }
+.feed-card[class*=" cs-"] { padding: 10px; }
+[class*=" cs-"] > .mini-stage, [class*=" cs-"] > .feed-stage { border: var(--border); border-radius: 8px 8px 0 0; }
+[class*=" cs-"] > .mini-body, [class*=" cs-"] > .feed-body { background: var(--surface); border: var(--border); border-top: 0; border-radius: 0 0 8px 8px; }
+.cs-stripe { background: repeating-linear-gradient(-45deg, var(--c-yellow) 0 7px, var(--c-pink) 7px 14px); }
+.cs-dots { background-color: var(--c-teal); background-image: radial-gradient(circle, #fff 0 2.5px, transparent 3px); background-size: 11px 11px; }
+.cs-nami { background-color: var(--c-lilac); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8'%3E%3Cpath d='M0 6 Q4 0 8 4 T16 2' fill='none' stroke='%231A1A1A' stroke-width='1.6'/%3E%3C/svg%3E"); background-size: 16px 8px; }
 .dev-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; }

@@ -11,6 +11,8 @@ import type { MyTrace, Point } from '../data/storage';
 import { toSvgPath } from '../lib/path';
 import { useFit } from '../lib/useFit';
 import { usePhotoURL } from '../data/photos';
+import { useAppState } from '../data/store';
+import { cardFrameClass } from './CardFrame';
 
 const COLORS = ['var(--c-pink)', 'var(--c-blue)', 'var(--c-teal)', 'var(--c-lilac)', 'var(--c-yellow)'];
 const INK = '#1A1A1A';
@@ -47,13 +49,15 @@ const overlay = (aspect: number, inner: preact.ComponentChildren) => (
 type Props = { item: FeedItem; mine: MyTrace | undefined; onDraw: () => void; onNext: () => void };
 
 export function FeedCard({ item, mine, onDraw, onNext }: Props) {
+  const equippedCard = useAppState().equipped.card;
   const [focus, setFocus] = useState<string | null>(null); // 強調表示する見え方（null = 全部）
 
   // だれかの形をそのまま見るカード
   if (item.kind === 'view') {
     const t = item.trace;
+    // 自分の投稿だけ、交換所で選んだカードの縁どりにする
     return (
-      <article class="card feed-card">
+      <article class={`card feed-card${item.ownPhotoId ? cardFrameClass(equippedCard) : ''}`}>
         <Photo item={item}>{overlay(item.aspect, <Lines outline={t.outline} details={t.details} aspect={item.aspect} color={INK} width={4} />)}</Photo>
         <div class="feed-body">
           <p class="small muted">{item.ownPhotoId ? 'あなたの投稿' : 'だれかの見え方'}</p>

@@ -1,11 +1,11 @@
-import { CalendarHeart, Info, Settings, X } from 'lucide-preact';
+import { Backpack, CalendarHeart, ChevronRight, Coins, Info, Settings, X } from 'lucide-preact';
 import { canForceChallenge, isChallengeForced, setChallengeForced } from '../config/challenges';
 import { APP_ENV, APP_VERSION } from '../config/env';
 import { useAppState } from '../data/store';
-import { StickerArt } from './StickerArt';
+import { href } from '../router';
 
 export function Drawer({ onClose }: { onClose: () => void }) {
-  const { points, stickers } = useAppState();
+  const { points } = useAppState();
   return (
     <>
       <div class="scrim" onClick={onClose} />
@@ -23,16 +23,14 @@ export function Drawer({ onClose }: { onClose: () => void }) {
           <p class="small muted">データはこの端末の中だけに保存されます。</p>
         </div>
 
-        <div class="card drawer-mine">
+        <a class="card drawer-mine" href={href('shop')} aria-label={`ポイント ${points}。交換所をひらく`}>
+          <Coins size={20} />
           <span class="small">ポイント <b>{points}</b></span>
-          {stickers.length > 0 && (
-            <span class="mine-stickers" aria-label="もっているシール">
-              {stickers.map((id) => <StickerArt id={id} />)}
-            </span>
-          )}
-        </div>
+          <span class="mine-go small">交換所<ChevronRight size={16} strokeWidth={2.6} /></span>
+        </a>
 
         <ul class="drawer-list">
+          <li><a href={href('items')}><Backpack size={20} />もちもの<ChevronRight class="go" size={18} strokeWidth={2.6} /></a></li>
           <li><CalendarHeart size={20} />月のふりかえり<span class="chip soon">準備中</span></li>
           <li><Settings size={20} />設定<span class="chip soon">準備中</span></li>
           <li><Info size={20} />このアプリについて<span class="chip soon">準備中</span></li>

@@ -7,7 +7,7 @@
  */
 import { STORAGE_PREFIX } from '../config/env';
 
-export const SCHEMA_VERSION = 7;
+export const SCHEMA_VERSION = 8;
 
 /** 写真上の座標。写真の幅・高さを 1 とした割合（0〜1） */
 export type Point = [number, number];
@@ -80,6 +80,10 @@ export interface AppState {
   stickers: string[];
   /** ポイント（本人にだけ見える。減らない／期限なし） */
   points: number;
+  /** 交換所で交換したもの（シール以外。config/shop.ts の id） */
+  owned: string[];
+  /** いま使っているきせかえ・カード（未設定＝いつもの） */
+  equipped: { theme?: string; card?: string };
 }
 
 const KEY = `${STORAGE_PREFIX}:state`;
@@ -98,10 +102,12 @@ const migrations: Record<number, (s: any) => any> = {
   5: (s) => ({ ...s, publishCount: (s.collections ?? []).length }),
   // v7：チャレンジの参加作品・シール・ポイントを追加
   6: (s) => ({ ...s, challengeEntries: [], stickers: [], points: 0 }),
+  // v8：交換したもの・使っているきせかえ／カードを追加
+  7: (s) => ({ ...s, owned: [], equipped: {} }),
 };
 
 function initialState(): AppState {
-  return { version: SCHEMA_VERSION, firstOpenedAt: new Date().toISOString(), openedDays: [], shapes: [], myTraces: {}, collections: [], publishCount: 0, challengeEntries: [], stickers: [], points: 0 };
+  return { version: SCHEMA_VERSION, firstOpenedAt: new Date().toISOString(), openedDays: [], shapes: [], myTraces: {}, collections: [], publishCount: 0, challengeEntries: [], stickers: [], points: 0, owned: [], equipped: {} };
 }
 
 function migrate(raw: any): AppState {
