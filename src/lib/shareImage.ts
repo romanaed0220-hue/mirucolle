@@ -1,6 +1,7 @@
 // 外部共有用の画像：写真の上に輪郭と描き足した線、下の帯に名前。
 import type { Shape } from '../data/storage';
 import { tracePath } from './path';
+import { strokeWithPen, type PenStyle } from './pen';
 
 const WIDTH = 1080;
 const BAND = 170;
@@ -29,17 +30,12 @@ export async function makeShareImage(shape: Shape, photo: Blob): Promise<File> {
 
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  const stroke = (pts: Shape['outline'], closed: boolean, w: number) => {
+  const stroke = (pts: Shape['outline'], closed: boolean, w: number, pen?: PenStyle) => {
     tracePath(ctx, pts, WIDTH, ph, closed);
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = w + 8;
-    ctx.stroke();
-    ctx.strokeStyle = '#1A1A1A';
-    ctx.lineWidth = w;
-    ctx.stroke();
+    strokeWithPen(ctx, pen, w, 8);
   };
-  stroke(shape.outline, true, 8);
-  for (const d of shape.details) stroke(d, false, 11);
+  stroke(shape.outline, true, 8, shape.outlinePen);
+  shape.details.forEach((d, i) => stroke(d, false, 11, shape.detailPens?.[i]));
 
   // 下の帯
   ctx.fillStyle = '#FFFDF6';

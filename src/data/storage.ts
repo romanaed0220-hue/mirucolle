@@ -6,8 +6,9 @@
  * 写真などの大きいデータはここに入れない（photos.ts / IndexedDB 側で扱う）。
  */
 import { STORAGE_PREFIX } from '../config/env';
+import type { PenStyle } from '../lib/pen';
 
-export const SCHEMA_VERSION = 8;
+export const SCHEMA_VERSION = 9;
 
 /** 写真上の座標。写真の幅・高さを 1 とした割合（0〜1） */
 export type Point = [number, number];
@@ -24,6 +25,9 @@ export interface Shape {
   outline: Point[];
   /** 描き足した線（目・手足など）。1 本ずつの配列 */
   details: Point[][];
+  /** 輪郭・描き足した線それぞれのペン（未設定＝くろ・ふつう） */
+  outlinePen?: PenStyle;
+  detailPens?: PenStyle[];
   /** つながりに投稿した日時（ISO）。未投稿なら undefined */
   postedAt?: string;
 }
@@ -56,6 +60,8 @@ export interface ChallengeEntry {
   aspect: number;
   outline: Point[];
   details: Point[][];
+  outlinePen?: PenStyle;
+  detailPens?: PenStyle[];
   /** 「収集にも入れる」を選んだときの形の id */
   shapeId?: string;
 }
@@ -104,6 +110,8 @@ const migrations: Record<number, (s: any) => any> = {
   6: (s) => ({ ...s, challengeEntries: [], stickers: [], points: 0 }),
   // v8：交換したもの・使っているきせかえ／カードを追加
   7: (s) => ({ ...s, owned: [], equipped: {} }),
+  // v9：線ごとのペン（outlinePen / detailPens）。省略可なので既存データはそのまま
+  8: (s) => s,
 };
 
 function initialState(): AppState {

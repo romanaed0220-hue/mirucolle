@@ -4,7 +4,7 @@ import { useState } from 'preact/hooks';
 import { CardSample } from '../components/CardFrame';
 import { CategoryTabs, ThemeSample } from '../components/ItemParts';
 import { StickerArt } from '../components/StickerArt';
-import { CATEGORIES, DEFAULT_NAMES, SHOP_ITEMS, type ShopCategory } from '../config/shop';
+import { DEFAULT_NAMES, ITEM_CATEGORIES, SHOP_ITEMS, type ShopCategory } from '../config/shop';
 import { stickerById } from '../config/stickers';
 import { equip, useAppState } from '../data/store';
 import { href } from '../router';
@@ -16,8 +16,8 @@ export function ItemsScreen() {
   return (
     <div class="screen">
       <div class="screen-inner items-screen">
-        <CategoryTabs value={cat} onChange={setCat} />
-        <p class="small muted">{CATEGORIES.find((c) => c.id === cat)?.hint}</p>
+        <CategoryTabs value={cat} onChange={setCat} cats={ITEM_CATEGORIES} />
+        <p class="small muted">{ITEM_CATEGORIES.find((c) => c.id === cat)?.hint}</p>
 
         {cat === 'sticker' ? (
           stickers.length === 0 ? (

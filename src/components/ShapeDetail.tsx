@@ -7,6 +7,7 @@ import { loadPhoto, usePhotoURL } from '../data/photos';
 import { setPosted } from '../data/store';
 import { toSvgPath } from '../lib/path';
 import { makeShareImage, shareOrDownload } from '../lib/shareImage';
+import { PenPath } from './PenPath';
 
 export function ShapeDetail({ shape, onClose }: { shape: Shape; onClose: () => void }) {
   const url = usePhotoURL(shape.photoId);
@@ -14,7 +15,6 @@ export function ShapeDetail({ shape, onClose }: { shape: Shape; onClose: () => v
   const [note, setNote] = useState<string | null>(null);
   const [shareFile, setShareFile] = useState<File | null>(null);
   const date = new Date(shape.createdAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
-  const stroke = { fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' } as const;
 
   // 共有画像はメニューを開いた時点で作っておく（iOS ではタップ直後でないと共有シートが開かないため）
   useEffect(() => {
@@ -74,13 +74,9 @@ export function ShapeDetail({ shape, onClose }: { shape: Shape; onClose: () => v
         <div class="detail-photo" style={{ aspectRatio: `${shape.aspect}` }}>
           {url && <img src={url} alt="" />}
           <svg viewBox={`0 0 ${shape.aspect} 1`} preserveAspectRatio="none" aria-hidden="true">
-            <path d={toSvgPath(shape.outline, shape.aspect, 1, true)} stroke="#fff" stroke-width="7" {...stroke} />
-            <path d={toSvgPath(shape.outline, shape.aspect, 1, true)} stroke="#1A1A1A" stroke-width="3" {...stroke} />
-            {shape.details.map((d) => (
-              <>
-                <path d={toSvgPath(d, shape.aspect, 1, false)} stroke="#fff" stroke-width="9" {...stroke} />
-                <path d={toSvgPath(d, shape.aspect, 1, false)} stroke="#1A1A1A" stroke-width="5" {...stroke} />
-              </>
+            <PenPath d={toSvgPath(shape.outline, shape.aspect, 1, true)} pen={shape.outlinePen} base={3} halo={4} />
+            {shape.details.map((d, i) => (
+              <PenPath d={toSvgPath(d, shape.aspect, 1, false)} pen={shape.detailPens?.[i]} base={5} halo={4} />
             ))}
           </svg>
         </div>

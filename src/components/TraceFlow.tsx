@@ -3,8 +3,10 @@ import { useState } from 'preact/hooks';
 import { RotateCcw, Undo2, X } from 'lucide-preact';
 import { DrawCanvas } from '../components/DrawCanvas';
 import type { Point } from '../data/storage';
+import { DEFAULT_PEN, type PenStyle } from '../lib/pen';
+import { PenBar } from './PenBar';
 
-export type TraceResult = { outline: Point[]; details: Point[][]; name: string };
+export type TraceResult = { outline: Point[]; details: Point[][]; name: string; outlinePen?: PenStyle; detailPens?: PenStyle[] };
 
 const NAME_MAX = 20;
 
@@ -27,6 +29,14 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLab
   const [outline, setOutline] = useState<Point[] | null>(null);
   const [tooSmall, setTooSmall] = useState(false);
   const [details, setDetails] = useState<Point[][]>([]);
+  // ペン：なぞる段階では輪郭のペンをそのまま変える。描き足しでは次に描く線のペン
+  const [pen, setPen] = useState<PenStyle>(DEFAULT_PEN);
+  const [outlinePen, setOutlinePen] = useState<PenStyle>(DEFAULT_PEN);
+  const [detailPens, setDetailPens] = useState<PenStyle[]>([]);
+  const changePen = (patch: Partial<PenStyle>) => {
+    setPen((p) => ({ ...p, ...patch }));
+    if (step === 'trace') setOutlinePen((p) => ({ ...p, ...patch }));
+  };
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -39,7 +49,10 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLab
     if (!outline || saving) return;
     setSaving(true);
     try {
-      await onSave({ outline, details, name: outlineOnly ? "" : name.trim() || "なまえのない形" });
+      await onSave({
+        outline, details, name: outlineOnly ? "" : name.trim() || "なまえのない形",
+        ...(outlineOnly ? {} : { outlinePen, detailPens }),
+      });
     } catch (e) {
       console.error(e);
       alert('保存できませんでした。もう一度お試しください。');
@@ -69,17 +82,22 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLab
           : '目や口、手足などを描き足して、名前をつけましょう。'}
       </p>
 
+      {!outlineOnly && <PenBar pen={pen} onChange={changePen} />}
+
       <DrawCanvas
         photoURL={photoURL}
         aspect={aspect}
         mode={step === 'trace' ? 'outline' : 'detail'}
         outline={outline}
         details={details}
+        outlinePen={outlineOnly ? undefined : outlinePen}
+        detailPens={detailPens}
+        pen={outlineOnly ? undefined : step === 'trace' ? outlinePen : pen}
         onOutline={(pts, invalid) => {
           setOutline(pts);
           setTooSmall(invalid);
         }}
-        onDetail={(pts) => setDetails((d) => [...d, pts])}
+        onDetail={(pts) => { setDetails((d) => [...d, pts]); setDetailPens((p) => [...p, pen]); }}
       />
 
       {step === 'trace' ? (
@@ -106,7 +124,7 @@ export function TraceFlow({ photoURL, aspect, showTakeStep, outlineOnly, saveLab
             onInput={(e) => setName((e.currentTarget as HTMLInputElement).value)}
           />
           <div class="flow-foot-row">
-            <button class="btn" onClick={() => (details.length ? setDetails((d) => d.slice(0, -1)) : setStep('trace'))}>
+            <button class="btn" onClick={() => (details.length ? (setDetails((d) => d.slice(0, -1)), setDetailPens((p) => p.slice(0, -1))) : setStep('trace'))}>
               <Undo2 size={18} strokeWidth={2.4} />{details.length ? '一つ戻す' : 'なぞり直す'}
             </button>
             <button class="btn primary" onClick={save} disabled={saving}>{saving ? '保存中…' : saveLabel}</button>

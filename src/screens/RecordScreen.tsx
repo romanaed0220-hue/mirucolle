@@ -121,20 +121,20 @@ export function RecordScreen() {
             topic={forChallenge && challenge ? `${challenge.label}「${challenge.theme}」` : undefined}
             saveLabel={forChallenge ? '参加する' : undefined}
             onClose={closeFlow}
-            onSave={async ({ outline, details, name }) => {
+            onSave={async ({ outline, details, name, outlinePen, detailPens }) => {
               const id = newId();
               await savePhoto(id, photo.blob);
               if (forChallenge && challenge) {
                 // お題の作品は収集とは別に残す（収集にも入れるかは、このあと選ぶ）
                 joinChallenge(
-                  { challengeId: challenge.id, createdAt: new Date().toISOString(), name, photoId: id, aspect: photo.width / photo.height, outline, details },
+                  { challengeId: challenge.id, createdAt: new Date().toISOString(), name, photoId: id, aspect: photo.width / photo.height, outline, details, outlinePen, detailPens },
                   challenge.reward,
                 );
                 closeFlow();
                 setDoneId(challenge.id);
                 return;
               }
-              addShape({ id, createdAt: new Date().toISOString(), name, photoId: id, aspect: photo.width / photo.height, outline, details });
+              addShape({ id, createdAt: new Date().toISOString(), name, photoId: id, aspect: photo.width / photo.height, outline, details, outlinePen, detailPens });
               closeFlow();
               location.hash = href('collect');
             }}

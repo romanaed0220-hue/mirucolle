@@ -2,6 +2,7 @@
 import type { Shape } from '../data/storage';
 import { usePhotoURL } from '../data/photos';
 import { bounds, toSvgPath } from '../lib/path';
+import { PenPath } from './PenPath';
 
 const SHADOWS = ['var(--deco-1)', 'var(--deco-2)', 'var(--deco-3)', 'var(--deco-4)', 'var(--deco-5)'];
 
@@ -46,9 +47,9 @@ export function ShapeSticker({ shape, maxSide, uid }: { shape: Shape; maxSide: n
         {url && <image href={url} x="0" y="0" width={shape.aspect} height="1" preserveAspectRatio="none" />}
       </g>
       <path d={outline} fill="none" stroke="var(--c-ink)" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
-      {shape.details.map((d) => (
-        <path d={toSvgPath(d, shape.aspect, 1, false)} fill="none" stroke="var(--c-ink)" stroke-width="3.4"
-          stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+      {/* 形の縁はシールの黒い線のまま。描き足した線だけ、描いたときのペンで */}
+      {shape.details.map((d, i) => (
+        <PenPath d={toSvgPath(d, shape.aspect, 1, false)} pen={shape.detailPens?.[i]} base={3.4} halo={0} />
       ))}
     </svg>
   );

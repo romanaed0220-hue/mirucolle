@@ -13,6 +13,7 @@ import { useFit } from '../lib/useFit';
 import { usePhotoURL } from '../data/photos';
 import { useAppState } from '../data/store';
 import { cardFrameClass } from './CardFrame';
+import { PenPath } from './PenPath';
 
 const COLORS = ['var(--c-pink)', 'var(--c-blue)', 'var(--c-teal)', 'var(--c-lilac)', 'var(--c-yellow)'];
 const INK = '#1A1A1A';
@@ -58,7 +59,13 @@ export function FeedCard({ item, mine, onDraw, onNext }: Props) {
     // 自分の投稿だけ、交換所で選んだカードの縁どりにする
     return (
       <article class={`card feed-card${item.ownPhotoId ? cardFrameClass(equippedCard) : ''}`}>
-        <Photo item={item}>{overlay(item.aspect, <Lines outline={t.outline} details={t.details} aspect={item.aspect} color={INK} width={4} />)}</Photo>
+        <Photo item={item}>{overlay(item.aspect, item.ownPhotoId ? (
+          // 自分の投稿は、描いたときのペンのまま
+          <>
+            <PenPath d={toSvgPath(t.outline, item.aspect, 1, true)} pen={t.outlinePen} base={4} halo={4} />
+            {t.details.map((d, i) => <PenPath d={toSvgPath(d, item.aspect, 1, false)} pen={t.detailPens?.[i]} base={4} halo={4} />)}
+          </>
+        ) : <Lines outline={t.outline} details={t.details} aspect={item.aspect} color={INK} width={4} />)}</Photo>
         <div class="feed-body">
           <p class="small muted">{item.ownPhotoId ? 'あなたの投稿' : 'だれかの見え方'}</p>
           <h2 class="head feed-name">{t.name}</h2>

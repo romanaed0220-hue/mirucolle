@@ -7,6 +7,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import type { Point } from '../data/storage';
 import { bounds, round4, tracePath } from '../lib/path';
+import { strokeWithPen, type PenStyle } from '../lib/pen';
 
 type Props = {
   photoURL: string;
@@ -14,6 +15,10 @@ type Props = {
   mode: 'outline' | 'detail';
   outline: Point[] | null;
   details: Point[][];
+  /** 輪郭・描き足した線それぞれのペンと、いま描いている線のペン */
+  outlinePen?: PenStyle;
+  detailPens?: PenStyle[];
+  pen?: PenStyle;
   /** 描き始め：(null, false)／小さすぎて無効：(null, true)／成功：(点列, false) */
   onOutline?: (pts: Point[] | null, invalid: boolean) => void;
   onDetail?: (pts: Point[]) => void;
@@ -54,19 +59,14 @@ export function DrawCanvas(props: Props) {
     const ctx = c.getContext('2d')!;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, box.w, box.h);
-    const { mode, outline, details } = propsRef.current;
+    const { mode, outline, details, outlinePen, detailPens, pen } = propsRef.current;
     const W = box.w, H = box.h;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    const stroke = (pts: Point[], closed: boolean, w: number) => {
+    const stroke = (pts: Point[], closed: boolean, w: number, p?: PenStyle) => {
       tracePath(ctx, pts, W, H, closed);
-      ctx.strokeStyle = '#FFFFFF';
-      ctx.lineWidth = w + 4;
-      ctx.stroke();
-      ctx.strokeStyle = '#1A1A1A';
-      ctx.lineWidth = w;
-      ctx.stroke();
+      strokeWithPen(ctx, p, w, 4);
     };
 
     if (outline && mode === 'detail') {
@@ -79,9 +79,9 @@ export function DrawCanvas(props: Props) {
       ctx.fill('evenodd');
       ctx.restore();
     }
-    if (outline) stroke(outline, true, 3);
-    for (const d of details) stroke(d, false, DETAIL_W);
-    if (live.current) stroke(live.current.pts, false, mode === 'outline' ? 3 : DETAIL_W);
+    if (outline) stroke(outline, true, 3, outlinePen);
+    details.forEach((d, i) => stroke(d, false, DETAIL_W, detailPens?.[i]));
+    if (live.current) stroke(live.current.pts, false, mode === 'outline' ? 3 : DETAIL_W, pen);
   };
 
   // キャンバスの解像度を合わせて再描画
@@ -94,7 +94,7 @@ export function DrawCanvas(props: Props) {
     draw();
   }, [box.w, box.h]);
 
-  useEffect(draw, [props.outline, props.details, props.mode]);
+  useEffect(draw, [props.outline, props.details, props.mode, props.outlinePen, props.detailPens]);
 
   // ポインター操作（ネイティブで登録：passive にしない、スクロールさせない）
   useEffect(() => {

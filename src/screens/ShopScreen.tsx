@@ -2,7 +2,7 @@
 import { useState } from 'preact/hooks';
 import { Check } from 'lucide-preact';
 import { CardSample } from '../components/CardFrame';
-import { CategoryTabs, ThemeSample } from '../components/ItemParts';
+import { CategoryTabs, PenSample, ThemeSample } from '../components/ItemParts';
 import { StickerArt } from '../components/StickerArt';
 import { CATEGORIES, SHOP_ITEMS, type ShopCategory, type ShopItem } from '../config/shop';
 import { exchange, useAppState } from '../data/store';
@@ -38,6 +38,7 @@ export function ShopScreen() {
                   {i.category === 'sticker' && <StickerArt id={i.id} />}
                   {i.category === 'theme' && <ThemeSample id={i.id} />}
                   {i.category === 'card' && <CardSample id={i.id} />}
+                  {i.category === 'pen' && <PenSample id={i.id} />}
                 </div>
                 <p class="item-name">{i.name}</p>
                 {got ? (

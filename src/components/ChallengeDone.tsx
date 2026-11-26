@@ -14,7 +14,7 @@ type Props = { challenge: ThemeChallenge; entry: ChallengeEntry; onClose: () => 
 export function ChallengeDone({ challenge, entry, onClose }: Props) {
   const [copied, setCopied] = useState(!!entry.shapeId);
   const sticker = stickerById(challenge.reward.stickerId);
-  const asShape = { id: `entry-${entry.challengeId}`, createdAt: entry.createdAt, name: entry.name, photoId: entry.photoId, aspect: entry.aspect, outline: entry.outline, details: entry.details };
+  const asShape = { id: `entry-${entry.challengeId}`, createdAt: entry.createdAt, name: entry.name, photoId: entry.photoId, aspect: entry.aspect, outline: entry.outline, details: entry.details, outlinePen: entry.outlinePen, detailPens: entry.detailPens };
 
   return (
     <div class="flow challenge-done">

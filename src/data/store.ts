@@ -83,6 +83,7 @@ export function copyEntryToCollect(challengeId: string): string | null {
   const shape: Shape = {
     id: newId(), createdAt: new Date().toISOString(), name: entry.name, photoId: entry.photoId,
     aspect: entry.aspect, outline: entry.outline, details: entry.details,
+    outlinePen: entry.outlinePen, detailPens: entry.detailPens,
   };
   lastAddedId = shape.id;
   update({

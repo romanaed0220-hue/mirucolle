@@ -23,7 +23,7 @@ function ownItems(shapes: Shape[]): FeedItem[] {
       photo: '',
       ownPhotoId: s.photoId,
       aspect: s.aspect,
-      trace: { id: s.id, name: s.name, outline: s.outline, details: s.details },
+      trace: { id: s.id, name: s.name, outline: s.outline, details: s.details, outlinePen: s.outlinePen, detailPens: s.detailPens },
     }));
 }
 

@@ -10,8 +10,9 @@
  * - odai：今月のお題。いつも 1 枚目。ask と同じく、描くとほかの人の見え方がひらく
  */
 import type { Point } from '../data/storage';
+import type { PenStyle } from '../lib/pen';
 
-export type SampleTrace = { id: string; name: string; outline: Point[]; details: Point[][] };
+export type SampleTrace = { id: string; name: string; outline: Point[]; details: Point[][]; outlinePen?: PenStyle; detailPens?: PenStyle[] };
 
 type Base = { id: string; photo: string; aspect: number };
 export type ViewItem = Base & {
